@@ -1,0 +1,80 @@
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 1"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<body pos="0 0 0">
+    <geom mesh="cone" type="mesh" rgba="1 0 0 0"/>
+</body>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 1" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
+<geom fromto="0.0 0.0 0.0 0.0 1.0 0.0" size="0.0420" rgba="0.8 0.6 .4 0" type="cylinder"/>
