@@ -4,7 +4,6 @@ Created Date: Monday June 7th 2021
 Author: Zhengyi Luo
 Comment:
 -----
-Last Modified: Monday June 7th 2021 3:57:49 pm
 Modified By: Zhengyi Luo at <zluo2@cs.cmu.edu>
 -----
 Copyright (c) 2021 Carnegie Mellon University, KLab
@@ -54,9 +53,7 @@ if __name__ == "__main__":
     flags.debug = args.debug
 
     if args.debug:
-        cfg.data_specs[
-            "file_path"
-        ] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test.pkl"
+        cfg.data_specs["file_path"] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test.pkl"
         cfg.num_threads = 1
         cfg.no_log = True
 
