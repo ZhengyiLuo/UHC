@@ -56,7 +56,7 @@ python uhc/smpllib/smpl_robot.py
 You will need to have downloaded smpl model files from [SMPL](https://smpl.is.tue.mpg.de/), [SMPL-H](https://smpl.is.tue.mpg.de/downloads), and [SMPL-X](https://smpl-x.is.tue.mpg.de/downloads).
 
 
-## Data processing for training UHC:
+## Data processing for training UHC
 
 TBD
 
@@ -66,7 +66,9 @@ TBD
 
 ## Training models
 
-TBD
+```
+python scripts/train_uhc.py --cfg copycat_40
+```
 
 ## Citation
 If you find our work useful in your research, please cite our papers [embodiedpose](https://zhengyiluo.github.io/projects/embodied_pose/),  [kin_poly](https://zhengyiluo.github.io/projects/kin_poly/), and [agent_design](https://zhengyiluo.github.io/projects/agent_design/).
