@@ -5,8 +5,8 @@ import math
 import numpy as np
 from uhc.utils.transformation import quaternion_from_matrix
 
-# TEMPLATE_FILE = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template_design.xml"
-TEMPLATE_FILE = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml"
+# TEMPLATE_FILE = "assets/mujoco_models/template/humanoid_template_design.xml"
+TEMPLATE_FILE = "assets/mujoco_models/template/humanoid_template.xml"
 
 
 class Bone:

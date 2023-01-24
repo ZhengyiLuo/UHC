@@ -40,7 +40,7 @@ class Bone:
 
 class Skeleton:
     def __init__(
-        self, template_dir="/hdd/zen/dev/copycat/Copycat/assets/bigfoot_template.pkl"
+        self, template_dir="assets/bigfoot_template.pkl"
     ):
         self.bones = []
         self.name2bone = {}
@@ -127,7 +127,7 @@ class Skeleton:
     def write_xml(
         self,
         fname,
-        template_fname="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml",
+        template_fname="assets/mujoco_models/template/humanoid_template.xml",
         offset=np.array([0, 0, 1]),
         ref_angles=None,
         bump_buffer=False,
@@ -155,7 +155,7 @@ class Skeleton:
 
     def write_str(
         self,
-        template_fname="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml",
+        template_fname="assets/mujoco_models/template/humanoid_template.xml",
         offset=np.array([0, 0, 1]),
         ref_angles=None,
         bump_buffer=False,

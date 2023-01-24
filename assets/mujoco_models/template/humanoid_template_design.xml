@@ -17,10 +17,10 @@
     <texture builtin="checker" height="100" name="texplane" rgb1="0 0 0" rgb2="0.8 0.8 0.8" type="2d" width="100"/>
     <material name="MatPlane" reflectance="0.5" shininess="1" specular="1" texrepeat="60 60" texture="texplane"/>
     <material name="geom" texture="texgeom" texuniform="true"/>
-    <texture type="skybox" file="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/common/sky1.png" gridsize="3 4" gridlayout=".U..LFRB.D.." width="8192" height="8192"/>
+    <texture type="skybox" file="assets/mujoco_models/common/sky1.png" gridsize="3 4" gridlayout=".U..LFRB.D.." width="8192" height="8192"/>
     <texture type="skybox" builtin="gradient" rgb1="0 0 0" rgb2="0 0 0" width="100" height="100"/>
-    <texture name="grass" file="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/common/grass.png" type="2d"/>
-    <texture name="concrete" file="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/common/concrete.png" type="2d"/>
+    <texture name="grass" file="assets/mujoco_models/common/grass.png" type="2d"/>
+    <texture name="concrete" file="assets/mujoco_models/common/concrete.png" type="2d"/>
     <material name="GrassPlane" reflectance="0.0" shininess="1" specular="1" texrepeat="100 100" texture="grass"/>
     <material name="ConcretePlane" reflectance="0.0" shininess="1" specular="1" texrepeat="100 100" texture="concrete"/>
   </asset>

@@ -322,7 +322,7 @@ class SMPLConverter:
 class SMPL_M_Renderer(object):
     def __init__(
             self,
-            model_file="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
+            model_file="assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
             render_size=(960, 480),
     ):
         self.model = load_model_from_path(model_file)
@@ -470,7 +470,7 @@ class SMPL_M_Renderer(object):
 class SMPL_M_Viewer(object):
     def __init__(
             self,
-            model_file="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
+            model_file="assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
             render_size=(960, 480),
     ):
         self.model = load_model_from_path(model_file)

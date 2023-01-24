@@ -226,9 +226,9 @@ if __name__ == "__main__":
     parser.add_argument("--algo", type=str, default="statear")
     args = parser.parse_args()
 
-    # data_res = joblib.load(f"/hdd/zen/dev/copycat/Copycat/results/motion_im/{args.cfg}/results/{args.iter:04d}_relive_all_coverage_full.pkl")
+    # data_res = joblib.load(f"results/motion_im/{args.cfg}/results/{args.iter:04d}_relive_all_coverage_full.pkl")
     data_res = joblib.load(
-        f"/hdd/zen/dev/copycat/Copycat/results/motion_im/{args.cfg}/results/{args.iter:04d}_all_coverage_full.pkl"
+        f"results/motion_im/{args.cfg}/results/{args.iter:04d}_all_coverage_full.pkl"
     )
 
     cfg = Config(cfg_id=args.cfg, create_dirs=False)

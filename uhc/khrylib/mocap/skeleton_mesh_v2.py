@@ -121,7 +121,7 @@ class Skeleton:
 
     def write_str(
         self,
-        template_fname="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml",
+        template_fname="assets/mujoco_models/template/humanoid_template.xml",
         offset=np.array([0, 0, 0]),
         ref_angles=None,
         bump_buffer=False,
@@ -136,7 +136,7 @@ class Skeleton:
     def write_xml(
         self,
         fname,
-        template_fname="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml",
+        template_fname="assets/mujoco_models/template/humanoid_template.xml",
         offset=np.array([0, 0, 0]),
         ref_angles=None,
         bump_buffer=False,
@@ -159,7 +159,7 @@ class Skeleton:
 
     def construct_tree(
         self,
-        template_fname="/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml",
+        template_fname="assets/mujoco_models/template/humanoid_template.xml",
         offset=np.array([0, 0, 0]),
         ref_angles=None,
     ):

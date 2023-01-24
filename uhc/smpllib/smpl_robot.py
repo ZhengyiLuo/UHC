@@ -1758,7 +1758,7 @@ class Robot:
                 "mesh",
                 {
                     "name": "cone",
-                    "file": "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/common/cone.stl",
+                    "file": "assets/mujoco_models/common/cone.stl",
                     "scale": "0.025 0.025 0.04",
                 },
             )
@@ -1943,17 +1943,9 @@ if __name__ == "__main__":
     t1 = time.time()
 
     viewer = MjViewer(sim)
-
-    jind = -1
-    jang = 30.0
     print(sim.data.qpos.shape, sim.data.ctrl.shape)
 
-    T = 10
-    t = 0
-    fr = 0
     stop = False
     paused = False
     while not stop:
         viewer.render()
-        if not paused:
-            t += 1

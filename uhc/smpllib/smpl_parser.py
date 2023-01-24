@@ -703,4 +703,4 @@ class SMPLX_Parser(_SMPLX):
             )
 
 if __name__ == "__main__":
-    smpl_p = SMPLH_Parser("/hdd/zen/dev/copycat/Copycat/data/smpl", gender="neutral")
+    smpl_p = SMPLH_Parser("data/smpl", gender="neutral")

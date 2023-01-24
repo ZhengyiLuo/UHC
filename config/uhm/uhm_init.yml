@@ -38,7 +38,7 @@ model_specs:
   prior_hsize: 
     - 2048
     - 1024
-  mujoco_model_file: '/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml'
+  mujoco_model_file: 'assets/mujoco_models/humanoid_smpl_neutral_mesh.xml'
   gt_rate: 0.7
   weights:
     r_pos_loss: 50.0

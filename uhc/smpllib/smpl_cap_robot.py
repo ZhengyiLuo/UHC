@@ -1741,7 +1741,7 @@ class Robot:
                 "mesh",
                 {
                     "name": "cone",
-                    "file": "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/common/cone.stl",
+                    "file": "assets/mujoco_models/common/cone.stl",
                     "scale": "0.025 0.025 0.04",
                 },
             )

@@ -517,10 +517,10 @@ if __name__ == "__main__":
         cfg_id="copycat_30",
         create_dirs=False,
     )
-    # cfg.mujoco_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh_all.xml"
-    cfg.mujoco_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_masterfoot.xml"
-    smpl_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml"
-    master_foot_model_file = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_masterfoot.xml"
+    # cfg.mujoco_model_file = "assets/mujoco_models/humanoid_smpl_neutral_mesh_all.xml"
+    cfg.mujoco_model_file = "assets/mujoco_models/humanoid_smpl_neutral_masterfoot.xml"
+    smpl_model_file = "assets/mujoco_models/humanoid_smpl_neutral_mesh.xml"
+    master_foot_model_file = "assets/mujoco_models/humanoid_smpl_neutral_masterfoot.xml"
     data_loader = DatasetAMASSSingle(cfg.data_specs, data_mode="test")
     init_expert = data_loader.sample_seq()
     cfg.masterfoot = True

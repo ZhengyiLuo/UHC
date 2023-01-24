@@ -155,7 +155,7 @@ class AgentUHM(AgentPPO):
         """load CC model"""
 
         self.cc_cfg = cc_cfg = CC_Config(
-            cfg_id=cfg.cc_cfg, base_dir="/hdd/zen/dev/copycat/Copycat/")
+            cfg_id=cfg.cc_cfg, base_dir="")
         cc_cfg.mujoco_model_file = cfg.scene_mujoco_file
 
         with torch.no_grad():

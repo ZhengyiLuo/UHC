@@ -17,30 +17,30 @@
     <texture builtin="checker" height="100" name="texplane" rgb1="0 0 0" rgb2="0.8 0.8 0.8" type="2d" width="100"/>
     <material name="MatPlane" reflectance="0.5" shininess="1" specular="1" texrepeat="60 60" texture="texplane"/>
     <material name="geom" texture="texgeom" texuniform="true"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/Pelvis.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Hip.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Hip.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/Torso.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Knee.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Knee.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/Spine.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Ankle.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Ankle.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/Chest.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Toe.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Toe.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/Neck.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Thorax.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Thorax.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/Head.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Shoulder.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Shoulder.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Elbow.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Elbow.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Wrist.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Wrist.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/L_Hand.stl"/>
-    <mesh file="/tmp/smpl/73045223-6254-41a6-946b-dac14eeed34a/geom/R_Hand.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/Pelvis.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Hip.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Hip.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/Torso.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Knee.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Knee.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/Spine.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Ankle.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Ankle.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/Chest.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Toe.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Toe.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/Neck.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Thorax.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Thorax.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/Head.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Shoulder.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Shoulder.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Elbow.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Elbow.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Wrist.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Wrist.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/L_Hand.stl"/>
+    <mesh file="/tmp/smpl/e6352ad0-6217-4d57-b9fc-62c14ac8d24d/geom/R_Hand.stl"/>
   </asset>
   <worldbody>
     <light cutoff="100" diffuse="1 1 1" dir="-0 0 -1.3" directional="true" exponent="1" pos="0 0 1.3" specular=".1 .1 .1"/>

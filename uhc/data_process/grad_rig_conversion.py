@@ -33,7 +33,7 @@ if __name__ == "__main__":
     device = (torch.device("cuda", index=0)
               if torch.cuda.is_available() else torch.device("cpu"))
     print(device)
-    smpl_p = SMPL_Parser("/hdd/zen/dev/copycat/Copycat/data/smpl",
+    smpl_p = SMPL_Parser("data/smpl",
                          gender="male")
     smpl_p.to(device)
 
