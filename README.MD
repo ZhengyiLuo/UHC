@@ -4,7 +4,7 @@
 
 TODOS:
 
-- [ ] Tutorial for smpl_robot
+- [x] Tutorial for smpl_robot
 - [ ] Runnable code for the SMPL model for motion imitation 
 - [ ] Data processing code for the AMASS dataset
 
@@ -44,8 +44,29 @@ mv mujoco210 ~/.mujoco/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mujoco210/bin
 ```
 
+## SMPL Robot
+
+The SMPL robot, an adaption of Robot class from [Transform2Act](https://github.com/Khrylx/Transform2Act), is an automatic humanoid generation class that supports SMPL, SMPL-H, and SMPL-X models. It creates XML file humanoid model for MuJoCo simulator, and can create humanoid of different gender and body shape. It supports both capsule based and mesh based models. We use SMPL Robot to create SMPL models to simulate on-the-fly when training our UHC with different body shapes. To run SMPL Robot, use:
+
+``` 
+
+python uhc/smpllib/smpl_robot.py
+
+```
+You will need to have downloaded smpl model files from [SMPL](https://smpl.is.tue.mpg.de/), [SMPL-H](https://smpl.is.tue.mpg.de/downloads), and [SMPL-X](https://smpl-x.is.tue.mpg.de/downloads).
 
 
+## Data processing for training UHC:
+
+TBD
+
+## Trained models
+
+TBD
+
+## Training models
+
+TBD
 
 ## Citation
 If you find our work useful in your research, please cite our papers [embodiedpose](https://zhengyiluo.github.io/projects/embodied_pose/),  [kin_poly](https://zhengyiluo.github.io/projects/kin_poly/), and [agent_design](https://zhengyiluo.github.io/projects/agent_design/).
