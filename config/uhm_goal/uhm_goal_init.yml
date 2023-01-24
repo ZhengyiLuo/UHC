@@ -1,0 +1,118 @@
+notes: "uhm goal policy first one, imitation goal"
+proj_name: "uhm_goal"
+
+data_specs:
+  train_files_path: 
+    - /hdd/zen/data/ActBound/AMASS/amass_copycat_train_singles.pkl
+  test_files_path:
+    - /hdd/zen/data/ActBound/AMASS/amass_copycat_train_singles.pkl
+  num_samples: 10000
+  fr_num: 100
+  batch_size: 256
+  
+scene_specs:
+  action_lst: 
+    - sit
+    - none
+  scene_mujoco_file: "humanoid_smpl_neutral_mesh"
+
+mujoco_model: 'humanoid_smpl_neutral_mesh'
+agent_name: agent_uhm_goal
+seed: 1
+augment: false
+
+model_specs:
+  model_name: kin_net
+  model_v: 1
+  rnn_hdim: 768
+  cnn_fdim: 512
+  mlp_hsize: [1024,  512, 256]
+  mlp_htype: 'relu'
+  rnn_type: "gru"
+  gt_rate: 0.3
+  gt_rate_decay: false
+  weights:
+    r_pos_loss: 50
+    r_rot_loss: 50
+    p_rot_loss: 1.0
+    vl_loss: 0.01
+    va_loss: 1.0
+    ee_loss: 10.0
+
+    r_pos_init_loss: 50
+    r_rot_init_loss: 50
+    p_rot_init_loss: 1.0
+    ee_init_loss: 10.0
+
+  add_noise: true
+  noise_std: 0.01
+  remove_base: false
+  autoregressive: true
+
+policy_specs:
+  policy_name: kin_policy
+  cc_cfg: copycat_30
+  cc_iter: 7600
+  policy_v: 1
+  log_std: -3.2
+  fix_std: true
+  gamma: 0.95
+  tau: 0.95
+  policy_htype: relu
+  policy_hsize: [512, 256]
+  policy_optimizer: 'Adam'
+  # policy_lr: 5.e-6
+  policy_lr: 1.e-5
+  policy_momentum: 0.0
+  policy_weightdecay: 0.0
+  value_htype: relu
+  value_hsize: [512, 256]
+  value_optimizer: 'Adam'
+  value_lr: 3.e-4
+  value_momentum: 0.0
+  value_weightdecay: 0.0
+  clip_epsilon: 0.2
+  env_episode_len: 150
+  min_batch_size: 10000
+  fix_std: true
+  reward_id: 'dynamic_supervision_v1'
+  end_reward: false
+  max_iter_num: 20000
+  rl_update: true
+  init_update: true
+  step_update: true
+  full_update: false
+  sampling_temp: 0.3
+  sampling_freq: 0.5
+  num_init_update: 2
+  num_step_update: 20
+  num_optim_epoch: 10
+  warm_update_full: 20
+
+  reward_weights:
+    w_p: 0.3
+    w_jp: 0.3
+    w_act_p: 0.3
+    w_act_v: 0.1
+
+    k_p: 50
+    k_jp: 50
+    k_act_p: 5
+    k_act_v: 0.005
+
+  super_weights:
+    r_pos_loss: 50
+    r_rot_loss: 50
+    p_rot_loss: 1.0
+    ee_loss: 10.0
+
+lr: 5.e-4
+weightdecay: 0.0
+num_epoch: 1000
+num_epoch_fix: 10
+save_n_epochs: 10
+batch_size: 512
+iter_method: iter
+shuffle: true
+has_z: true
+policy_optimizer: Adam

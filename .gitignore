@@ -1,0 +1,43 @@
+#n't track content of these folders
+trained_models/
+someOtherfoler/
+data/amass
+data/h36m
+data/rendering
+data/smpl
+results/
+.vscode/
+.ipynb_checkpoints/
+lightning_logs
+wandb/
+*.swp
+.python-version
+wandb
+wandb-debug.log
+__pycache__
+.ipynb_checkpoints
+.DS_Store
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.pyc
+*.so
+*.egg-info
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip

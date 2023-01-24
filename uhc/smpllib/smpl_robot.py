@@ -1338,9 +1338,6 @@ class Robot:
 
         all_root = self.tree.getroot()
         contact_node = Element("contact", {})
-        # for child, parent in joint_parents.items():
-        #     if not parent is None:
-        #         SubElement(contact_node,"exclude",{"name": parent + "_" + child, "body1": parent, "body2": child},)
         
         SubElement(contact_node,"exclude",{"name": "add01", "body1": "L_Shoulder", "body2": "Chest"},)
         SubElement(contact_node,"exclude",{"name": "add02", "body1": "R_Shoulder", "body2": "Chest"},)
@@ -1403,46 +1400,10 @@ class Robot:
                     )
                 )
 
-        # hfield = ""
-        # hfield = None
-        # if hfield is not None:
-        #     asset = self.tree.getroot().find("asset")
-        #     hfield_name = osp.join(self.model_dirs[-1], f"field.png")
-        #     # hfield_name = osp.join("./assets/mujoco_models/common", f"field.png")
-        #     hfield_data = np.zeros((100, 100, 1))
-        #     hfield_data[25:75, 25:75] = 15
-        #     hfield_data[0, 0] = 256
-        #     cv2.imwrite(hfield_name, hfield_data)
-
-        #     asset.append(
-        #             Element(
-        #                 "hfield",
-        #                 {
-        #                     "name": "floor",
-        #                     "size": "4 4 2 0.1",
-        #                     "file": hfield_name,
-        #                 },
-        #             )
-        #         )
-        #     geom = self.tree.getroot().find("worldbody").find("geom")
-        #     geom.attrib['hfield'] = 'floor'
-        #     geom.attrib['type'] = 'hfield'
-        #     geom.attrib['size'] = '8 8 1'
-        #     geom.attrib['friction'] = '1. .1 .1'
-
+       
         if not params is None:
             self.set_params(params)
-
-        # size_dict = self.get_size()
-        # get_joint_geometries(
-        #         verts,
-        #         joints,
-        #         skin_weights,
-        #         joint_names,
-        #         scale_dict = size_dict,
-        #         geom_dir=f"{self.model_dirs[-1]}/geom",
-        #     )
-
+ 
     def in_body(self, body, point):
         return in_hull(self.hull_dict[body]["norm_hull"], point)
 
@@ -1951,14 +1912,8 @@ if __name__ == "__main__":
     # parser.add_argument("--cfg", default="copycat_ball_1")
     parser.add_argument("--cfg", default="copycat_40")
     args = parser.parse_args()
+ 
 
-    # model_name = 'walker2d'
-    # cfg_path = f'design_opt/cfg/a4_walker_cd_r3_p4.yml'
-    # model_name = 'humanoid_smpl_neutral_bigfoot'
-    # model_name = "humanoid_v1"
-    # model_name = 'humanoid_v2'
-
-    # cfg_path = f"design_opt/cfg/humanoid/cont/single_v2_lots.yml"
     cfg = Config(cfg_id=args.cfg, create_dirs=False)
     cfg.robot_cfg["model"] = "smpl"
     cfg.robot_cfg["mesh"] = True
@@ -1967,43 +1922,21 @@ if __name__ == "__main__":
     # smpl_robot = Robot(cfg.robot_cfg, masterfoot=True)
     params_names = smpl_robot.get_params(get_name=True)
 
-    # params = smpl_robot.get_params()
-    # new_params = params  +  0.8
-    # new_params = params
-    # print(params_names)
-    # smpl_robot.set_params(new_params)
-    # params_new = smpl_robot.get_params()
-    # print(params)
+     
+    # from uhc.smpllib.smpl_mujoco import smpl_6d_to_qpose, smpl_to_qpose
+    # relive_mocap_grad = joblib.load("/hdd/zen/data/ActBound/AMASS/singles/amass_copycat_take5_singles_run.pkl")
+    # print(relive_mocap_grad.keys())
+    # k = "0-ACCAD_Male2Running_c3d_C3 - run_poses"
+    # full_pose = relive_mocap_grad[k]['pose_aa']
+    # trans = relive_mocap_grad[k]['trans']
+    # beta = relive_mocap_grad[k]['beta']
+    # gender = relive_mocap_grad[k]['gender']
 
-    # params_new2 = smpl_robot.get_params()
-    # assert(np.allclose(new_params2, smpl_robot.get_params()))
-
-    # smpl_robot.add_child_to_body(smpl_robot.bodies[0])
-    # smpl_robot.remove_body(smpl_robot.bodies[-2])
-    # params = smpl_robot.get_params()
-    # print(params_names, params)
-    # new_params = params # + 0.1
-    # smpl_robot.set_params(new_params)
-    # params_new = smpl_robot.get_params()
-    # smpl_robot.write_xml(f'out/{model_name}_add_test.xml')
-
-    # print(smpl_robot.export_vis_string())
-
-
-    from uhc.smpllib.smpl_mujoco import smpl_6d_to_qpose, smpl_to_qpose
-    relive_mocap_grad = joblib.load("/hdd/zen/data/ActBound/AMASS/singles/amass_copycat_take5_singles_run.pkl")
-    print(relive_mocap_grad.keys())
-    k = "0-ACCAD_Male2Running_c3d_C3 - run_poses"
-    full_pose = relive_mocap_grad[k]['pose_aa']
-    trans = relive_mocap_grad[k]['trans']
-    beta = relive_mocap_grad[k]['beta']
-    gender = relive_mocap_grad[k]['gender']
-
-    smpl_robot.load_from_skeleton(betas = torch.from_numpy(beta[None, ]), gender = [1])
+    smpl_robot.load_from_skeleton( gender = [1])
     smpl_robot.write_xml(f"test.xml")
     model = load_model_from_path(f"test.xml")
 
-    amass_data = smpl_to_qpose(pose = full_pose, mj_model = model, trans = trans)
+    # amass_data = smpl_to_qpose(pose = full_pose, mj_model = model, trans = trans)
 
     print(f"mass {mujoco_py.functions.mj_getTotalmass(model)}")
     sim = MjSim(model)
@@ -2014,7 +1947,6 @@ if __name__ == "__main__":
     jind = -1
     jang = 30.0
     print(sim.data.qpos.shape, sim.data.ctrl.shape)
-    from scipy.spatial.transform import Rotation as sRot
 
     T = 10
     t = 0
@@ -2022,15 +1954,6 @@ if __name__ == "__main__":
     stop = False
     paused = False
     while not stop:
-        # import pdb
-        # pdb.set_trace()
-        if t >= math.floor(T):
-            sim.data.qpos[:76] = amass_data[fr % amass_data.shape[0]]
-            # sim.data.qpos[:76] = amass_data[0]
-            sim.forward()
-            fr += 1
-            t = 0
-
         viewer.render()
         if not paused:
             t += 1

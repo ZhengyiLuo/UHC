@@ -1,0 +1,63 @@
+notes: "Test ground for universal human model"
+proj_name: "uhm"
+
+data_specs:
+  train_files_path: 
+    - /hdd/zen/data/ActBound/AMASS/amass_qpos_test.pkl
+  test_files_path:
+    - /hdd/zen/data/ActBound/AMASS/amass_qpos_test.pkl
+  has_smpl_root: true
+  traj_dim: 144
+  fr_num: 150
+  load_class: -1
+  root_dim: 6
+  has_z: true
+  mlp_htype: "relu"
+  num_samples: 50000
+  batch_szie: 384
+
+loss_specs:
+  loss_names:
+    - MSE
+    - MSE_RT
+    - KLD
+  loss_weights:
+    mse: 1
+    kld: 0.1
+    mse_rt: 20
+
+model_specs:
+  nz: 512
+  model_name: VAEDynamV1
+  encoder_hsize: 
+    - 2048
+    - 1024
+  decoder_hsize: 
+    - 2048
+    - 1024
+  prior_hsize: 
+    - 2048
+    - 1024
+  mujoco_model_file: '/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/humanoid_smpl_neutral_mesh.xml'
+  gt_rate: 0.7
+  weights:
+    r_pos_loss: 50.0
+    r_rot_loss: 50.0
+    p_rot_loss: 1.0
+    vl_loss: 1.0
+    va_loss: 10.0
+    ee_loss: 1.0
+    kld: 1.0
+  learned_prior: true
+  add_noise: true
+  noise_std: 0.01
+
+norm_data: false
+lr: 3.e-4
+
+batch_size: 400
+num_epoch: 300
+num_epoch_fix: 10
+save_n_epochs: 10
+
+

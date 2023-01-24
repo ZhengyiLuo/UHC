@@ -2,13 +2,23 @@
 
 > Repo under construction.  
 
+TODOS:
+
+- [ ] Tutorial for smpl_robot
+- [ ] Runnable code for the SMPL model for motion imitation 
+- [ ] Data processing code for the AMASS dataset
+
+
+
+...
+
 <div float="center">
   <img src="assets/gif/teaser.gif" />
 </div>
 
 ## Introduction 
 
-In this project, we develop the Universal Humanoid Controller used in our projects: [embodiedpose](https://zhengyiluo.github.io/projects/embodied_pose/), [kin_poly](https://zhengyiluo.github.io/projects/kin_poly/), and [agent_design](https://zhengyiluo.github.io/projects/agent_design/). It is a humanoid controller is task-agnostic and only takes reference frames as input. We uses the MuJoCo simulator for this repository. It relives heavily on [residual force control](https://github.com/Khrylx/RFC) for keeping the humanoid stable, and we are actively working on relying less on this dependency. Here are a few highlights of the controller:
+In this project, we develop the Universal Humanoid Controller used in our projects: [embodiedpose](https://zhengyiluo.github.io/projects/embodied_pose/), [kin_poly](https://zhengyiluo.github.io/projects/kin_poly/), and [agent_design](https://zhengyiluo.github.io/projects/agent_design/). It is a physics-based humanoid controller trained with Reinforcement Learning to imitate reference human motion. UHC is task-agnostic and only takes reference frames as input. We uses the MuJoCo simulator for this repository. It relives heavily on [residual force control](https://github.com/Khrylx/RFC) for keeping the humanoid stable, and we are actively working on relying less on this dependency. Here are a few highlights of the controller:
 
 - Supports controlling humanoids constructed from SMPL, SMPL-H, and SMPL-X models, of all genders and body shapes.
 - Causal and takes in one-frame of reference frame as input.
