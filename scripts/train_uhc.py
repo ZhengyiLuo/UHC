@@ -27,11 +27,9 @@ import torch
 import numpy as np
 import wandb
 
-from torch.utils.tensorboard import SummaryWriter
 from uhc.utils.flags import flags
 from uhc.utils.config_utils.copycat_config import Config
 from uhc.agents import agent_dict
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -81,11 +79,7 @@ if __name__ == "__main__":
 
     dtype = torch.float64
     torch.set_default_dtype(dtype)
-    device = (
-        torch.device("cuda", index=args.gpu_index)
-        if torch.cuda.is_available()
-        else torch.device("cpu")
-    )
+    device = (torch.device("cuda", index=args.gpu_index) if torch.cuda.is_available() else torch.device("cpu"))
     # device = torch.device("cpu")
     if torch.cuda.is_available():
         torch.cuda.set_device(args.gpu_index)
@@ -95,13 +89,10 @@ if __name__ == "__main__":
 
     from uhc.agents.agent_copycat import AgentCopycat
 
-    agent = agent_dict[cfg.agent_name](
-        cfg, dtype, device, training=True, checkpoint_epoch=args.epoch
-    )
+    agent = agent_dict[cfg.agent_name](cfg, dtype, device, training=True, checkpoint_epoch=args.epoch)
     # agent.eval_policy(epoch = args.epoch, dump=True)
     for i_iter in range(args.epoch, cfg.num_epoch):
         agent.optimize_policy(i_iter)
-
         """clean up gpu memory"""
         torch.cuda.empty_cache()
 
