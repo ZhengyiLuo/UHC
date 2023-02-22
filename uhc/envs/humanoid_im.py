@@ -153,6 +153,8 @@ class HumanoidEnv(mujoco_env.MujocoEnv):
 
     def reset_robot(self):
         beta = self.expert["beta"].copy()
+        if not self.cc_cfg.has_shape:
+            beta = np.zeros((1, 16))  # no shape variation
         gender = self.expert["gender"].copy()
         obj_info = self.expert.get("obj_info", None)
         obj_pose = self.expert.get("obj_pose", None)
@@ -182,48 +184,33 @@ class HumanoidEnv(mujoco_env.MujocoEnv):
         expert_meta = {"cyclic": False, "seq_name": expert_data["seq_name"]}
         self.expert = copy.deepcopy(expert_data)
 
-        if self.cc_cfg.has_shape:
-            pose_aa = expert_data["pose_aa"]
-            trans = expert_data["trans"]
-            self.expert_save = copy.deepcopy(expert_data)
-            if reload_robot:
-                self.reset_robot()
+        pose_aa = expert_data["pose_aa"]
+        trans = expert_data["trans"]
+        self.expert_save = copy.deepcopy(expert_data)
+        if reload_robot:
+            self.reset_robot()
 
-            self.humanoid.update_model(self.model)
-            if self.use_quat:
-                expert_qpos_quat = smpl_to_qpose(
-                    pose=pose_aa,
-                    mj_model=self.model,
-                    trans=trans.squeeze(),
-                    model=self.cc_cfg.robot_cfg.get("model", "smpl"),
-                    use_quat=self.use_quat,
-                    count_offset=self.cc_cfg.robot_cfg.get("mesh", True),
-                )
-
-            expert_qpos = smpl_to_qpose(
+        self.humanoid.update_model(self.model)
+        if self.use_quat:
+            expert_qpos_quat = smpl_to_qpose(
                 pose=pose_aa,
                 mj_model=self.model,
                 trans=trans.squeeze(),
                 model=self.cc_cfg.robot_cfg.get("model", "smpl"),
+                use_quat=self.use_quat,
                 count_offset=self.cc_cfg.robot_cfg.get("mesh", True),
             )
 
-            self.expert["meta"] = expert_meta
-            self.expert.update(self.humanoid.qpos_fk(torch.from_numpy(expert_qpos)))  # Not using this since the masterfoot stuff...
-            # if self.use_quat: self.expert['qpos'] = expert_qpos_quat
+        expert_qpos = smpl_to_qpose(
+            pose=pose_aa,
+            mj_model=self.model,
+            trans=trans.squeeze(),
+            model=self.cc_cfg.robot_cfg.get("model", "smpl"),
+            count_offset=self.cc_cfg.robot_cfg.get("mesh", True),
+        )
 
-            # self.expert.update(get_expert_master(expert_qpos, expert_meta, self))
-
-        else:
-            expert_qpos = expert_data["qpos"]
-
-            if self.cc_cfg.masterfoot:
-                self.expert.update(get_expert_master(expert_qpos, expert_meta, self))
-            else:
-                self.expert.update(get_expert(expert_qpos, expert_meta, self))
-
-        # import ipdb; ipdb.set_trace()
-        # self.expert['wbquat'][0] - expert_qpos_quat[0, 3:]
+        self.expert["meta"] = expert_meta
+        self.expert.update(self.humanoid.qpos_fk(torch.from_numpy(expert_qpos)))  # Not using this since the masterfoot stuff...
 
         if self.cc_cfg.obs_v == 3:
             self.expert["len"] -= 30

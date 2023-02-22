@@ -33,7 +33,7 @@ obs_v: 1
 reactive_v: 1
 reactive_rate: 0.3
 sampling_temp: 0.2
-has_shape: true
+has_shape: false
 
 reward_weights:
   w_p: 0.3
