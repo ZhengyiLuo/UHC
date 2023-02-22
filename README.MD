@@ -5,7 +5,7 @@
 TODOS:
 
 - [x] Tutorial for smpl_robot
-- [ ] Runnable code for the SMPL model for motion imitation 
+- [x] Runnable and trainalbe code for the SMPL model for motion imitation 
 - [ ] Data processing code for the AMASS dataset
 
 
@@ -62,13 +62,37 @@ TBD
 
 ## Trained models
 
-TBD
+Download pretrained models: 
+- Implicit RFC: [download](https://drive.google.com/file/d/1CA3lKhIEOwzhX7IMdu_B_QnjrXfPXYnM/view?usp=share_link)
+- Explicit RFC [download](https://drive.google.com/file/d/1wdsS0wRji3vFY6xvORptVdFEJLyY_I1T/view?usp=share_link)
+
+You can also use the download_data script to download the models:
+```
+bash download_data.sh
+```
+
+## Evaluation
+```
+python scripts/eval_uhc.py --cfg uhc_implicit --epoch 19000 --data sample_data/amass_copycat_take5_test_small.pkl
+python scripts/eval_uhc.py --cfg uhc_explicit --epoch 5000 --data sample_data/amass_copycat_take5_test_small.pkl
+```
 
 ## Training models
 
 ```
-python scripts/train_uhc.py --cfg copycat_40
+python scripts/train_uhc.py --cfg uhc_implicit
 ```
+
+## Viewer Shortcuts
+
+| Keyboard | Function |
+| ---- | --- |
+| Q | Next sample |
+| Space | pause |
+| B | hide expert |
+| M | hide imitation |
+| T | Record screenshot|
+| V | Record video|
 
 ## Citation
 If you find our work useful in your research, please cite our papers [embodiedpose](https://zhengyiluo.github.io/projects/embodied_pose/),  [kin_poly](https://zhengyiluo.github.io/projects/kin_poly/), and [agent_design](https://zhengyiluo.github.io/projects/agent_design/).
@@ -96,3 +120,10 @@ If you find our work useful in your research, please cite our papers [embodiedpo
 }
 ``` 
 
+
+## References
+This repository is built on top of the following amazing repositories:
+* Part of the UHC code is from: [rfc](https://github.com/Khrylx/RFC)
+* SMPL models and layer is from: [SMPL-X model](https://github.com/vchoutas/smplx)
+* Feature extractors are from: [SPIN](https://github.com/nkolot/SPIN)
+* NN modules are from (khrylib): [DLOW](https://github.com/Khrylx/DLow)

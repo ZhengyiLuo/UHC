@@ -34,7 +34,6 @@ from uhc.utils.config_utils.copycat_config import Config
 from uhc.utils.image_utils import write_frames_to_video
 import wandb
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--cfg", default=None)
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     parser.add_argument("--resume", type=str, default=None)
     parser.add_argument("--no_log", action="store_true", default=False)
     parser.add_argument("--debug", action="store_true", default=False)
-    parser.add_argument("--data", type=str, default="take5_test")
+    parser.add_argument("--data", type=str, default="sample_data/amass_copycat_take5_test_small.pkl")
     parser.add_argument("--mode", type=str, default="vis")
     parser.add_argument("--render_video", action="store_true", default=False)
     parser.add_argument("--render_rfc", action="store_true", default=False)
@@ -71,41 +70,8 @@ if __name__ == "__main__":
     cfg.output = osp.join("/hdd/zen/data/copycat/renderings/uhc/", f"{cfg.id}")
     os.makedirs(cfg.output, exist_ok=True)
 
- 
-    if args.data == "take5_test":
-        cfg.data_specs[
-            "file_path"
-        ] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test.pkl"
-    elif args.data == "all":
-        cfg.data_specs[
-            "file_path"
-        ] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5.pkl"
-    elif args.data == "take5_test_small":
-        cfg.data_specs[
-            "file_path"
-        ] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test_small.pkl"
-    elif args.data == "take5_single":
-        cfg.data_specs[
-            "file_path"
-        ] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5_single.pkl"
-    elif args.data == "grab_test":
-        cfg.data_specs["file_path"] = "/hdd/zen/data/ActBound/AMASS/grab_test.pkl"
-    elif args.data == "grab":
-        cfg.data_specs["file_path"] = "/hdd/zen/data/ActBound/AMASS/grab_take1.pkl"
-    elif args.data == "usr":
-        cfg.data_specs["file_path"] = '/hdd/zen/data/video_pose/Tennis/demo/denmarkopen_2021_mens_semifinal_leecheukyiu_axelsen/test.pkl'
-    else:
-        if osp.isfile(f"/hdd/zen/data/ActBound/AMASS/singles/amass_copycat_{args.data}.pkl"):
-            cfg.data_specs[
-            "file_path"
-            ] = f"/hdd/zen/data/ActBound/AMASS/singles/amass_copycat_{args.data}.pkl"
-        else:
-            cfg.data_specs[
-            "file_path"
-            ] = f"/hdd/zen/data/ActBound/AMASS/amass_copycat_{args.data}.pkl"
+    cfg.data_specs["file_path"] = args.data
 
-
-        
     if "test_file_path" in cfg.data_specs:
         del cfg.data_specs["test_file_path"]
 
@@ -144,9 +110,7 @@ if __name__ == "__main__":
         # vis = CopycatVisualizer(
         #     agent.env.smpl_robot.export_vis_string().decode("utf-8"), agent
         # )
-        vis = CopycatVisualizer(
-            agent.env.smpl_robot.export_vis_string().decode("utf-8"), agent
-        )
+        vis = CopycatVisualizer(agent.env.smpl_robot.export_vis_string().decode("utf-8"), agent)
         vis.display_coverage()
     else:
         from uhc.utils.copycat_visualizer import CopycatVisualizer
@@ -157,7 +121,5 @@ if __name__ == "__main__":
         # vis = CopycatVisualizer(
         #     agent.env.smpl_robot.export_vis_string().decode("utf-8"), agent
         # )
-        vis = CopycatVisualizer(
-            agent.env.smpl_robot.export_vis_string().decode("utf-8"), agent
-        )
+        vis = CopycatVisualizer(agent.env.smpl_robot.export_vis_string().decode("utf-8"), agent)
         vis.show_animation()

@@ -4,6 +4,7 @@ import math
 
 
 class Visualizer:
+
     def __init__(self, vis_file):
         self.fr = 0
         self.num_fr = 0
@@ -88,4 +89,3 @@ class Visualizer:
             self.render()
             if not self.paused:
                 self.t += 1
-            

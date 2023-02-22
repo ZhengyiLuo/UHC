@@ -1,0 +1,101 @@
+# data
+notes: "Meta Pd V1, gelu, has EXPLICIT rfc, no futures, train full amass"
+
+# training parameters
+gamma: 0.95
+tau: 0.95
+policy_htype: gelu
+policy_hsize: [2048, 1024, 512]
+policy_optimizer: "Adam"
+policy_lr: 5.e-5
+policy_momentum: 0.0
+policy_weightdecay: 0.0
+value_htype: gelu
+value_hsize: [2048, 1024, 512]
+value_optimizer: "Adam"
+value_lr: 3.e-4
+value_momentum: 0.0
+value_weightdecay: 0.0
+clip_epsilon: 0.2
+min_batch_size: 50000
+mini_batch_size: 50000
+num_optim_epoch: 10
+log_std: -2.3
+fix_std: true
+num_epoch: 25000
+seed: 1
+save_n_epochs: 100
+reward_id: "world_rfc_explicit"
+obs_type: "full"
+actor_type: "gauss"
+num_primitive: 8
+action_v: 1
+obs_v: 2
+fut_frames: 3
+skip: 10
+has_shape: true
+reactive_v: 0
+reactive_rate: 0.3
+sampling_temp: 0.1
+sampling_freq: 0.5
+
+reward_weights:
+  w_p: 0.3
+  w_v: 0.1
+  w_e: 0.45
+  w_c: 0.1
+  w_vf: 0.05
+  k_p: 2.0
+  k_v: 0.005
+  k_e: 5.0
+  k_c: 100.0
+  k_vf: 1.0
+
+data_specs:
+  dataset_name: amass
+  # file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test.pkl
+  file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take5_train.pkl
+  state_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_states_obs_v2.pkl
+  
+
+  neutral_path: /hdd/zen/data/ActBound/AMASS/standing_neutral.pkl
+  flip_cnd: 0
+  has_smpl_root: true
+  traj_dim: 144
+  t_min: 31
+  t_max: 300
+
+  nc: 2
+  load_class: -1
+  adaptive_iter: 200
+  root_dim: 6
+  flip_time: false
+  mode: "all"
+  base_rot: [0.7071, 0.7071, 0.0, 0.0]
+
+# expert and environment
+meta_pd: true
+meta_pd_joint: false
+mujoco_model: humanoid_smpl_neutral_mesh
+vis_model: humanoid_smpl_neutral_mesh_vis
+
+env_episode_len: 100000
+env_term_body: "body"
+env_expert_trail_steps: 0
+obs_coord: "root"
+obs_phase: false
+
+# RFC parameters
+residual_force: True
+residual_force_scale: 100
+residual_force_mode: explicit
+rfc_decay: false
+rfc_decay_max: 10000
+
+robot:
+  mesh: True
+  model: "smpl"
+  body_params: {}
+  joint_params: {}
+  geom_params: {}
+  actuator_params: {}
