@@ -91,6 +91,7 @@ python scripts/train_uhc.py --cfg uhc_implicit
 | Q | Next sample |
 | Space | pause |
 | B | hide expert |
+| N | seperate expert and imitation |
 | M | hide imitation |
 | T | Record screenshot|
 | V | Record video|

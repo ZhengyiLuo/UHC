@@ -17,6 +17,7 @@ import mujoco_py
 
 
 class CopycatVisualizer(Visualizer):
+
     def __init__(self, vis_file, agent):
         self.agent = agent
         super().__init__(vis_file)
@@ -27,6 +28,7 @@ class CopycatVisualizer(Visualizer):
         self.image_acc = []
         self.data_gen = self.data_generator()
         self.data = next(self.data_gen)
+
         self.setup_viewing_angle()
 
     def set_video_path(self, image_path, video_path):
@@ -44,48 +46,33 @@ class CopycatVisualizer(Visualizer):
         self.env_vis.set_custom_key_callback(self.key_callback)
 
     def data_generator(self):
+
         if self.agent.cfg.mode != "disp_stats":
             for loader in self.agent.test_data_loaders:
                 for take_key in loader.data_keys:
+
                     self.cur_key = take_key
-                    print(
-                        f"Generating for {take_key} seqlen: {loader.get_sample_len_from_key(take_key)}"
-                    )
+                    print(f"Generating for {take_key} seqlen: {loader.get_sample_len_from_key(take_key)}")
                     eval_res = self.agent.eval_seq(take_key, loader)
                     print(
                         "Agent Mass:",
                         mujoco_py.functions.mj_getTotalmass(self.agent.env.model),
                     )
-                    print_str = "\t".join(
-                        [
-                            f"{k}: {v:.3f}"
-                            for k, v in eval_res.items()
-                            if not k
-                            in [
-                                "gt",
-                                "pred",
-                                "pred_jpos",
-                                "gt_jpos",
-                                "reward",
-                                "gt_vertices",
-                                "pred_vertices",
-                                "gt_joints",
-                                "pred_joints",
-                                "action",
-                                "vf_world",
-                            ] and (not isinstance(v, np.ndarray))
-                        ]
-                    )
+                    print_str = "\t".join([f"{k}: {v:.3f}" for k, v in eval_res.items() if not k in [
+                        "gt",
+                        "pred",
+                        "pred_jpos",
+                        "gt_jpos",
+                        "reward",
+                        "gt_vertices",
+                        "pred_vertices",
+                        "gt_joints",
+                        "pred_joints",
+                        "action",
+                        "vf_world",
+                    ] and (not isinstance(v, np.ndarray))])
                     self.env_vis.reload_sim_model(
-                        self.agent.env.smpl_robot.export_vis_string(
-                            num_cones=int(
-                                self.agent.env.vf_dim / self.agent.env.body_vf_dim
-                            )
-                            if self.agent.cc_cfg.residual_force and self.agent.cfg.render_rfc
-                            and self.agent.cc_cfg.residual_force_mode == "explicit"
-                            else 0,
-                        ).decode("utf-8")
-                    )
+                        self.agent.env.smpl_robot.export_vis_string(num_cones=int(self.agent.env.vf_dim / self.agent.env.body_vf_dim) if self.agent.cc_cfg.residual_force and self.agent.cfg.render_rfc and self.agent.cc_cfg.residual_force_mode == "explicit" else 0,).decode("utf-8"))
 
                     self.setup_viewing_angle()
                     self.set_video_path(
@@ -124,9 +111,7 @@ class CopycatVisualizer(Visualizer):
         self.env_vis.model.geom_size[i + 1] = size
         self.env_vis.model.geom_rgba[i + 1] = np.array([0.0, 0.8, 1.0, 1.0])
 
-        self.env_vis.model.body_pos[i + len(self.env_vis.model.body_names)] = (
-            contact_point + force
-        )
+        self.env_vis.model.body_pos[i + len(self.env_vis.model.body_names)] = (contact_point + force)
         self.env_vis.model.body_quat[i + len(self.env_vis.model.body_names)] = quat
         # self.env_vis.model.geom_rgba[ i+ 49] = np.array([0.0, 0.8, 1.0, 1.0])
 
@@ -149,20 +134,14 @@ class CopycatVisualizer(Visualizer):
         #     print(self.fr)
         # print(self.fr)
         expert = self.agent.env.expert
-        lim = self.agent.env.converter.new_nq + (
-            expert["obj_pose"].shape[1] if expert["has_obj"] else 0
-        )
+        lim = self.agent.env.converter.new_nq + (expert["obj_pose"].shape[1] if expert["has_obj"] else 0)
 
         # self.data["pred"][self.fr][-14:] = expert["obj_pose"][self.fr]
 
         self.env_vis.data.qpos[:lim] = self.data["pred"][self.fr]
         self.env_vis.data.qpos[lim:] = self.data["gt"][self.fr]
 
-        if (
-            self.agent.cfg.render_rfc
-            and self.agent.cc_cfg.residual_force
-            and self.agent.cc_cfg.residual_force_mode == "explicit"
-        ):
+        if (self.agent.cfg.render_rfc and self.agent.cc_cfg.residual_force and self.agent.cc_cfg.residual_force_mode == "explicit"):
 
             self.render_virtual_force(self.data["vf_world"][self.fr])
 
@@ -170,7 +149,7 @@ class CopycatVisualizer(Visualizer):
         # if args.record_expert:
         # self.env_vis.data.qpos[:env.model.nq] = self.data['gt'][self.fr]
         if self.agent.cfg.hide_im:
-            self.env_vis.data.qpos[ 2] = 100.0
+            self.env_vis.data.qpos[2] = 100.0
 
         if self.agent.cfg.hide_expert:
             self.env_vis.data.qpos[lim + 2] = 100.0
@@ -184,9 +163,7 @@ class CopycatVisualizer(Visualizer):
         if self.agent.cfg.render_video:
             size = (1920, 1080)
             data = np.asarray(
-                self.env_vis.viewer.read_pixels(size[0], size[1], depth=False)[
-                    ::-1, :, :
-                ],
+                self.env_vis.viewer.read_pixels(size[0], size[1], depth=False)[::-1, :, :],
                 dtype=np.uint8,
             )
             self.image_acc.append(cv2.cvtColor(data, cv2.COLOR_BGR2RGB))
@@ -266,7 +243,7 @@ class CopycatVisualizer(Visualizer):
                 print(f"{v['percent']:.3f} |  {k}")
                 self.num_fr = len(v["pred"])
                 yield v
-        
+
         self.data_gen = iter(vis_gen())
         self.data = next(self.data_gen)
         self.show_animation()

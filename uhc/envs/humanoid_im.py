@@ -155,9 +155,7 @@ class HumanoidEnv(mujoco_env.MujocoEnv):
         beta = self.expert["beta"].copy()
 
         gender = self.expert["gender"].copy()
-        if not self.cc_cfg.has_shape:
-            beta[:] = 0
-            gender[:] = 0
+
         obj_info = self.expert.get("obj_info", None)
         obj_pose = self.expert.get("obj_pose", None)
 

@@ -10,6 +10,7 @@ TEMPLATE_FILE = "assets/mujoco_models/template/humanoid_template.xml"
 
 
 class Bone:
+
     def __init__(self):
         # original bone info
         self.id = None
@@ -30,6 +31,7 @@ class Bone:
 
 
 class Skeleton:
+
     def __init__(self, model_dir):
         self.model_dir = model_dir
         self.bones = []
@@ -133,9 +135,7 @@ class Skeleton:
             ref_angles=None,
             bump_buffer=False,
     ):
-        tree = self.construct_tree(ref_angles=ref_angles,
-                                   offset=offset,
-                                   template_fname=template_fname)
+        tree = self.construct_tree(ref_angles=ref_angles, offset=offset, template_fname=template_fname)
         if bump_buffer:
             SubElement(tree.getroot(), "size", self.buffer_dict)
         return etree.tostring(tree, pretty_print=True)
@@ -148,9 +148,7 @@ class Skeleton:
             ref_angles=None,
             bump_buffer=False,
     ):
-        tree = self.construct_tree(ref_angles=ref_angles,
-                                   offset=offset,
-                                   template_fname=template_fname)
+        tree = self.construct_tree(ref_angles=ref_angles, offset=offset, template_fname=template_fname)
         if bump_buffer:
             SubElement(tree.getroot(), "size", self.buffer_dict)
         # create sensors
@@ -229,8 +227,7 @@ class Skeleton:
         if bone.parent is None:
             j_attr = dict()
             j_attr["name"] = bone.name
-            j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos +
-                                                               offset))
+            j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos + offset))
             j_attr["limited"] = "false"
             j_attr["type"] = "free"
             j_attr["armature"] = "0"
@@ -239,7 +236,7 @@ class Skeleton:
             j_attr["frictionloss"] = "0"
             if bone.name in ["L_Ankle", "R_Ankle", "L_Toe", "R_Toe"]:
                 j_attr["frictionloss"] = "500"
-                
+
             SubElement(node, "joint", j_attr)
         else:
 
@@ -249,12 +246,10 @@ class Skeleton:
                 j_attr = dict()
                 j_attr["name"] = bone.name + "_" + bone.channels[i]
                 j_attr["type"] = "hinge"
-                j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos +
-                                                                   offset))
+                j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos + offset))
                 j_attr["axis"] = "{0:.4f} {1:.4f} {2:.4f}".format(*axis)
                 if i < len(bone.lb):
-                    j_attr["range"] = "{0:.4f} {1:.4f}".format(
-                        bone.lb[i], bone.ub[i])
+                    j_attr["range"] = "{0:.4f} {1:.4f}".format(bone.lb[i], bone.ub[i])
                 else:
                     j_attr["range"] = "-180.0 180.0"
                 if j_attr["name"] in ref_angles.keys():
@@ -310,9 +305,7 @@ class Skeleton:
                     e1 += v * 0.02
                     e2 -= v * 0.02
                     g_attr["type"] = "capsule"
-                    g_attr[
-                        "fromto"] = "{0:.4f} {1:.4f} {2:.4f} {3:.4f} {4:.4f} {5:.4f}".format(
-                            *np.concatenate([e1, e2]))
+                    g_attr["fromto"] = "{0:.4f} {1:.4f} {2:.4f} {3:.4f} {4:.4f} {5:.4f}".format(*np.concatenate([e1, e2]))
                 else:
                     g_attr["type"] = "sphere"
                     g_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*bone.pos)

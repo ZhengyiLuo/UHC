@@ -9,6 +9,7 @@ from mujoco_py.utils import rec_copy, rec_assign
 import numpy as np
 import imageio
 
+
 class MjViewerBasic(cymj.MjRenderContextWindow):
     """
     A simple display GUI showing the scene of an :class:`.MjSim` with a mouse-movable camera.
@@ -64,10 +65,7 @@ class MjViewerBasic(cymj.MjRenderContextWindow):
             return
 
         # Determine whether to move, zoom or rotate view
-        mod_shift = (
-            glfw.get_key(window, glfw.KEY_LEFT_SHIFT) == glfw.PRESS
-            or glfw.get_key(window, glfw.KEY_RIGHT_SHIFT) == glfw.PRESS
-        )
+        mod_shift = (glfw.get_key(window, glfw.KEY_LEFT_SHIFT) == glfw.PRESS or glfw.get_key(window, glfw.KEY_RIGHT_SHIFT) == glfw.PRESS)
         if self._button_right_pressed:
             action = const.MOUSE_MOVE_H if mod_shift else const.MOUSE_MOVE_V
         elif self._button_left_pressed:
@@ -87,12 +85,8 @@ class MjViewerBasic(cymj.MjRenderContextWindow):
         self._last_mouse_y = int(self._scale * ypos)
 
     def _mouse_button_callback(self, window, button, act, mods):
-        self._button_left_pressed = (
-            glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS
-        )
-        self._button_right_pressed = (
-            glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_RIGHT) == glfw.PRESS
-        )
+        self._button_left_pressed = (glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS)
+        self._button_right_pressed = (glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_RIGHT) == glfw.PRESS)
 
         x, y = glfw.get_cursor_pos(window)
         self._last_mouse_x = int(self._scale * x)
@@ -154,11 +148,11 @@ class MjViewer(MjViewerBasic):
         self._transparent = False  # Make everything transparent.
 
         # this variable is estamated as a running average.
-        
+
         self._hide_overlay = False  # hide the entire overlay.
         self._user_overlay = {}
 
-        self.video_fps = 120
+        self.video_fps = 60
         # self.video_fps = 30
         self._time_per_render = 1 / self.video_fps
 
@@ -186,9 +180,7 @@ class MjViewer(MjViewerBasic):
                 frame = self._read_pixels_as_in_window()
                 self._video_queue.put(frame)
             else:
-                self._time_per_render = 0.9 * self._time_per_render + 0.1 * (
-                    time.time() - render_start
-                )
+                self._time_per_render = 0.9 * self._time_per_render + 0.1 * (time.time() - render_start)
 
         self._user_overlay = copy.deepcopy(self._overlay)
         # Render the same frame if paused.
@@ -201,9 +193,7 @@ class MjViewer(MjViewerBasic):
         else:
             # inner_loop runs "_loop_count" times in expectation (where "_loop_count" is a float).
             # Therefore, frames are displayed in the real-time.
-            self._loop_count += (
-                self.sim.model.opt.timestep * self.frame_skip - self.sim_time
-            ) / (self._time_per_render * self._run_speed)
+            self._loop_count += (self.sim.model.opt.timestep * self.frame_skip - self.sim_time) / (self._time_per_render * self._run_speed)
             if self._render_every_frame:
                 self._loop_count = 1
             while self._loop_count > 0:
@@ -276,9 +266,7 @@ class MjViewer(MjViewerBasic):
             "Referenc[e] frames",
             "Off" if self.vopt.frame == 1 else "On",
         )
-        self.add_overlay(
-            const.GRID_TOPLEFT, "T[r]ansparent", "On" if self._transparent else "Off"
-        )
+        self.add_overlay(const.GRID_TOPLEFT, "T[r]ansparent", "On" if self._transparent else "Off")
         self.add_overlay(
             const.GRID_TOPLEFT,
             "Display [M]ocap bodies",
@@ -289,9 +277,7 @@ class MjViewer(MjViewerBasic):
                 self.add_overlay(const.GRID_TOPLEFT, "Stop", "[Space]")
             else:
                 self.add_overlay(const.GRID_TOPLEFT, "Start", "[Space]")
-            self.add_overlay(
-                const.GRID_TOPLEFT, "Advance simulation by one step", "[right arrow]"
-            )
+            self.add_overlay(const.GRID_TOPLEFT, "Advance simulation by one step", "[right arrow]")
         self.add_overlay(const.GRID_TOPLEFT, "[H]ide Menu", "")
         if self._record_video:
             ndots = int(7 * (time.time() % 1))
@@ -312,9 +298,7 @@ class MjViewer(MjViewerBasic):
             extra = " (while video is not recorded)"
         else:
             extra = ""
-        self.add_overlay(
-            const.GRID_BOTTOMLEFT, "FPS", "%d%s" % (1 / self._time_per_render, extra)
-        )
+        self.add_overlay(const.GRID_BOTTOMLEFT, "FPS", "%d%s" % (1 / self._time_per_render, extra))
         self.add_overlay(
             const.GRID_BOTTOMLEFT,
             "Solver iterations",
@@ -346,9 +330,7 @@ class MjViewer(MjViewerBasic):
         elif key == glfw.KEY_RIGHT and self._paused is not None:
             self._advance_by_one_step = True
             self._paused = True
-        elif key == glfw.KEY_V or (
-            key == glfw.KEY_ESCAPE and self._record_video
-        ):  # Records video. Trigers with V or if in progress by ESC.
+        elif key == glfw.KEY_V or (key == glfw.KEY_ESCAPE and self._record_video):  # Records video. Trigers with V or if in progress by ESC.
             self._record_video = not self._record_video
             if self._record_video:
                 # Rough estimate of fps of the video since rendering speed is unknown.
@@ -398,14 +380,10 @@ class MjViewer(MjViewerBasic):
                         if body_idx1 == body_idx2:
                             if not self._show_mocap:
                                 # Store transparency for later to show it.
-                                self.sim.extras[geom_idx] = self.sim.model.geom_rgba[
-                                    geom_idx, 3
-                                ]
+                                self.sim.extras[geom_idx] = self.sim.model.geom_rgba[geom_idx, 3]
                                 self.sim.model.geom_rgba[geom_idx, 3] = 0
                             else:
-                                self.sim.model.geom_rgba[geom_idx, 3] = self.sim.extras[
-                                    geom_idx
-                                ]
+                                self.sim.model.geom_rgba[geom_idx, 3] = self.sim.extras[geom_idx]
         elif key in (glfw.KEY_0, glfw.KEY_1, glfw.KEY_2, glfw.KEY_3, glfw.KEY_4):
             self.vopt.geomgroup[key - glfw.KEY_0] ^= 1
         super().key_callback(window, key, scancode, action, mods)
