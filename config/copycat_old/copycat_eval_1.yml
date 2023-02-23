@@ -60,7 +60,7 @@ data_specs:
   # test_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take2_test_singles.pkl
   # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_mocap_qpos_grad.pkl
   # test_file_path: /hdd/zen/data/ActBound/AMASS/egopose_mocap_qpos_grad.pkl
-  test_file_path: /hdd/zen/data/ActBound/AMASS/h36m_train_no_sit_30_qpos.pkl
+  # test_file_path: /hdd/zen/data/ActBound/AMASS/h36m_train_no_sit_30_qpos.pkl
   # test_file_path: /hdd/zen/data/ActBound/AMASS/h36m_train_30_qpos.pkl
   # test_file_path: "/hdd/zen/data/ActBound/AMASS/prox_sample.pkl"
   # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_ar_qpos.pkl

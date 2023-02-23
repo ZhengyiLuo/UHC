@@ -50,6 +50,7 @@ import multiprocessing
 
 
 class AgentCopycat(AgentPPO):
+
     def __init__(self, cfg, dtype, device, training=True, checkpoint_epoch=0):
         self.cfg = cfg
         self.cc_cfg = cfg
@@ -106,9 +107,7 @@ class AgentCopycat(AgentPPO):
 
     def print_config(self):
         cfg, device, dtype = self.cfg, self.device, self.dtype
-        self.logger.info(
-            "==========================Agent Copycat==========================="
-        )
+        self.logger.info("==========================Agent Copycat===========================")
         self.logger.info(f"Feature Version: {cfg.obs_v}")
         self.logger.info(f"Meta Pd: {cfg.meta_pd}")
         self.logger.info(f"Meta Pd Joint: {cfg.meta_pd_joint}")
@@ -119,15 +118,11 @@ class AgentCopycat(AgentPPO):
 
     def setup_data_loader(self):
         cfg, device, dtype = self.cfg, self.device, self.dtype
-        self.data_loader = data_loader = DatasetAMASSSingle(
-            cfg.data_specs, data_mode="train"
-        )
+        self.data_loader = data_loader = DatasetAMASSSingle(cfg.data_specs, data_mode="train")
         self.test_data_loaders = []
         self.test_data_loaders.append(data_loader)
         if len(cfg.data_specs.get("test_file_path", [])) > 0:
-            self.test_data_loaders.append(
-                DatasetAMASSSingle(cfg.data_specs, data_mode="test")
-            )
+            self.test_data_loaders.append(DatasetAMASSSingle(cfg.data_specs, data_mode="test"))
 
     def setup_env(self):
         cfg, device, dtype = self.cfg, self.device, self.dtype
@@ -147,13 +142,9 @@ class AgentCopycat(AgentPPO):
         self.action_dim = action_dim = env.action_space.shape[0]
         """define actor and critic"""
         if cfg.actor_type == "gauss":
-            self.policy_net = PolicyGaussian(
-                cfg, action_dim=action_dim, state_dim=state_dim
-            )
+            self.policy_net = PolicyGaussian(cfg, action_dim=action_dim, state_dim=state_dim)
         elif cfg.actor_type == "mcp":
-            self.policy_net = PolicyMCP(
-                cfg, action_dim=action_dim, state_dim=state_dim
-            )
+            self.policy_net = PolicyMCP(cfg, action_dim=action_dim, state_dim=state_dim)
         self.running_state = ZFilter((state_dim,), clip=5)
         to_device(device, self.policy_net)
 
@@ -273,11 +264,7 @@ class AgentCopycat(AgentPPO):
         cfg, device, dtype = self.cfg, self.device, self.dtype
         freq_path = osp.join(cfg.result_dir, "freq_dict.pt")
         try:
-            self.freq_dict = (
-                {k: [] for k in self.data_loader.data_keys}
-                if not osp.exists(freq_path)
-                else joblib.load(freq_path)
-            )
+            self.freq_dict = ({k: [] for k in self.data_loader.data_keys} if not osp.exists(freq_path) else joblib.load(freq_path))
             for k in self.data_loader.data_keys:
                 if not k in self.freq_dict:
                     raise Exception("freq_dict is not initialized")
@@ -297,9 +284,7 @@ class AgentCopycat(AgentPPO):
         set_optimizer_lr(self.optimizer_policy, cfg.adp_policy_lr)
         if cfg.rfc_decay:
             if self.epoch < cfg.get("rfc_decay_max", 10000):
-                self.env.rfc_rate = lambda_rule(
-                    self.epoch, cfg.get("rfc_decay_max", 10000), cfg.num_epoch_fix
-                )
+                self.env.rfc_rate = lambda_rule(self.epoch, cfg.get("rfc_decay_max", 10000), cfg.num_epoch_fix)
             else:
                 self.env.rfc_rate = 0.0
 
@@ -322,6 +307,7 @@ class AgentCopycat(AgentPPO):
                     T_u { info['T_update']:.2f}\tETA {get_eta_str(self.epoch, cfg.num_epoch, info['T_total'])} \
                 \texpert_R_avg {log.avg_c_reward:.4f} {np.array2string(c_info, formatter={'all': lambda x: '%.4f' % x}, separator=',')}\
                  \texpert_R_range ({log.min_c_reward:.4f}, {log.max_c_reward:.4f})\teps_len {log.avg_episode_len:.2f}"
+
         self.logger.info(log_str)
 
         if not cfg.no_log:
@@ -347,7 +333,6 @@ class AgentCopycat(AgentPPO):
 
         if cfg.end_reward:
             self.env.end_reward = log.avg_c_reward * cfg.gamma / (1 - cfg.gamma)
-
         """update networks"""
         t1 = time.time()
         self.update_params(batch)
@@ -373,20 +358,17 @@ class AgentCopycat(AgentPPO):
 
         res_dicts = []
         for data_loader in data_loaders:
-            # num_jobs = self.num_threads
-            num_jobs = 20
+            num_jobs = self.num_threads
             jobs = data_loader.data_keys
             chunk = np.ceil(len(jobs) / num_jobs).astype(int)
-            jobs = [jobs[i : i + chunk] for i in range(0, len(jobs), chunk)]
+            jobs = [jobs[i:i + chunk] for i in range(0, len(jobs), chunk)]
             data_res_coverage = {}
             with to_cpu(*self.sample_modules):
                 with torch.no_grad():
                     queue = multiprocessing.Queue()
                     for i in range(len(jobs) - 1):
                         worker_args = (jobs[i + 1], data_loader, queue, i)
-                        worker = multiprocessing.Process(
-                            target=self.eval_seqs, args=worker_args
-                        )
+                        worker = multiprocessing.Process(target=self.eval_seqs, args=worker_args)
                         worker.start()
                     res = self.eval_seqs(jobs[0], data_loader, None)
                     data_res_coverage.update(res)
@@ -395,11 +377,7 @@ class AgentCopycat(AgentPPO):
                         data_res_coverage.update(res)
 
                 for k, res in data_res_coverage.items():
-                    [
-                        self.freq_dict[k].append([res["succ"], 0])
-                        for _ in range(1 if res["succ"] else 3)
-                        if k in self.freq_dict
-                    ]
+                    [self.freq_dict[k].append([res["succ"], 0]) for _ in range(1 if res["succ"] else 3) if k in self.freq_dict]
 
                 metric_names = [
                     "mpjpe",
@@ -413,37 +391,22 @@ class AgentCopycat(AgentPPO):
                     "skate",
                 ]
                 data_res_metrics = defaultdict(list)
-                [
-                    [
-                        data_res_metrics[k].append(v if np.ndim(v) == 0 else np.mean(v))
-                        for k, v in res.items()
-                        if k in metric_names
-                    ]
-                    for k, res in data_res_coverage.items()
-                ]
+                [[data_res_metrics[k].append(v if np.ndim(v) == 0 else np.mean(v)) for k, v in res.items() if k in metric_names] for k, res in data_res_coverage.items()]
                 data_res_metrics = {k: np.mean(v) for k, v in data_res_metrics.items()}
                 coverage = int(data_res_metrics["succ"] * data_loader.get_len())
-                print_str = " \t".join(
-                    [f"{k}: {v:.3f}" for k, v in data_res_metrics.items()]
-                )
+                print_str = " \t".join([f"{k}: {v:.3f}" for k, v in data_res_metrics.items()])
 
-                self.logger.info(
-                    f"Coverage {data_loader.name} of {coverage} out of {data_loader.get_len()} | {print_str}"
-                )
-                data_res_metrics.update(
-                    {
-                        "mean_coverage": coverage / data_loader.get_len(),
-                        "num_coverage": coverage,
-                        "all_coverage": data_loader.get_len(),
-                    }
-                )
+                self.logger.info(f"Coverage {data_loader.name} of {coverage} out of {data_loader.get_len()} | {print_str}")
+                data_res_metrics.update({
+                    "mean_coverage": coverage / data_loader.get_len(),
+                    "num_coverage": coverage,
+                    "all_coverage": data_loader.get_len(),
+                })
                 del data_res_metrics["succ"]
                 res_dicts.append({f"coverage_{data_loader.name}": data_res_metrics})
 
                 if dump:
-                    res_dir = osp.join(
-                        cfg.output_dir, f"{epoch}_{data_loader.name}_coverage_full.pkl"
-                    )
+                    res_dir = osp.join(cfg.output_dir, f"{epoch}_{data_loader.name}_coverage_full.pkl")
                     print(res_dir)
                     joblib.dump(data_res_coverage, res_dir)
 
@@ -475,44 +438,26 @@ class AgentCopycat(AgentPPO):
         with to_cpu(*self.sample_modules):
             with torch.no_grad():
                 res = defaultdict(list)
-                self.env.load_expert(
-                    loader.get_sample_from_key(
-                        take_key=take_key, full_sample=True, fr_start=-1
-                    )
-                )
+
+                self.env.load_expert(loader.get_sample_from_key(take_key=take_key, full_sample=True, fr_start=-1))
+
                 state = self.env.reset()
                 if self.running_state is not None:
                     state = self.running_state(state)
 
-
                 for t in range(10000):
-                    res["gt"].append(
-                        self.env.get_expert_attr(
-                            "qpos", self.env.get_expert_index(t)
-                        ).copy()
-                    )
+                    res["gt"].append(self.env.get_expert_attr("qpos", self.env.get_expert_index(t)).copy())
 
                     res["pred"].append(self.env.data.qpos.copy())
 
-                    res["gt_jpos"].append(
-                        self.env.get_expert_attr(
-                            "wbpos", self.env.get_expert_index(t)
-                        ).copy()
-                    )
+                    res["gt_jpos"].append(self.env.get_expert_attr("wbpos", self.env.get_expert_index(t)).copy())
                     res["pred_jpos"].append(self.env.get_wbody_pos().copy())
                     state_var = tensor(state).unsqueeze(0)
                     trans_out = self.trans_policy(state_var)
 
-                    action = (
-                        self.policy_net.select_action(trans_out, mean_action=True)[0]
-                        .cpu()
-                        .numpy()
-                    )
+                    action = (self.policy_net.select_action(trans_out, mean_action=True)[0].cpu().numpy())
                     next_state, env_reward, done, info = self.env.step(action)
-                    if (
-                        self.cc_cfg.residual_force
-                        and self.cc_cfg.residual_force_mode == "explicit"
-                    ):
+                    if (self.cc_cfg.residual_force and self.cc_cfg.residual_force_mode == "explicit"):
                         res["vf_world"].append(self.env.get_world_vf())
 
                     if self.render:
@@ -550,24 +495,20 @@ class AgentCopycat(AgentPPO):
         freq_dict = defaultdict(list)
         while logger.num_steps < min_batch_size:
             if self.fit_single_key != "":
-                self.env.load_expert(
-                    self.data_loader.get_sample_from_key(
-                        self.fit_single_key,
-                        full_sample=False,
-                        freq_dict=self.freq_dict,
-                        precision_mode=self.precision_mode,
-                    )
-                )
+                self.env.load_expert(self.data_loader.get_sample_from_key(
+                    self.fit_single_key,
+                    full_sample=False,
+                    freq_dict=self.freq_dict,
+                    precision_mode=self.precision_mode,
+                ))
             else:
-                self.env.load_expert(
-                    self.data_loader.sample_seq(
-                        freq_dict=self.freq_dict,
-                        full_sample=False,
-                        sampling_temp=self.cfg.sampling_temp,
-                        sampling_freq=self.cfg.sampling_freq,
-                        precision_mode=self.precision_mode,
-                    )
-                )
+                self.env.load_expert(self.data_loader.sample_seq(
+                    freq_dict=self.freq_dict,
+                    full_sample=False,
+                    sampling_temp=self.cfg.sampling_temp,
+                    sampling_freq=self.cfg.sampling_freq,
+                    precision_mode=self.precision_mode,
+                ))
             # self.env.load_expert(self.data_loader.sample_seq(freq_dict = self.freq_dict, full_sample = True))
 
             state = self.env.reset()
@@ -579,17 +520,9 @@ class AgentCopycat(AgentPPO):
             for t in range(10000):
                 state_var = tensor(state).unsqueeze(0)
                 trans_out = self.trans_policy(state_var)
-                mean_action = self.mean_action or self.env.np_random.binomial(
-                    1, 1 - self.noise_rate
-                )
-                action = self.policy_net.select_action(trans_out, mean_action)[
-                    0
-                ].numpy()
-                action = (
-                    int(action)
-                    if self.policy_net.type == "discrete"
-                    else action.astype(np.float64)
-                )
+                mean_action = self.mean_action or self.env.np_random.binomial(1, 1 - self.noise_rate)
+                action = self.policy_net.select_action(trans_out, mean_action)[0].numpy()
+                action = (int(action) if self.policy_net.type == "discrete" else action.astype(np.float64))
                 next_state, env_reward, done, info = self.env.step(action)
                 if self.running_state is not None:
                     next_state = self.running_state(next_state)
@@ -618,9 +551,7 @@ class AgentCopycat(AgentPPO):
 
                 if done:
 
-                    freq_dict[self.data_loader.curr_key].append(
-                        [info["percent"], self.data_loader.fr_start]
-                    )
+                    freq_dict[self.data_loader.curr_key].append([info["percent"], self.data_loader.fr_start])
                     break
                 state = next_state
 
@@ -645,34 +576,23 @@ class AgentCopycat(AgentPPO):
                 loggers = [None] * self.num_threads
                 for i in range(self.num_threads - 1):
                     worker_args = (i + 1, queue, thread_batch_size)
-                    worker = multiprocessing.Process(
-                        target=self.sample_worker, args=worker_args
-                    )
+                    worker = multiprocessing.Process(target=self.sample_worker, args=worker_args)
                     worker.start()
-                memories[0], loggers[0], freq_dict = self.sample_worker(
-                    0, None, thread_batch_size
-                )
+                memories[0], loggers[0], freq_dict = self.sample_worker(0, None, thread_batch_size)
 
-                self.freq_dict = {
-                    k: v + freq_dict[k] for k, v in self.freq_dict.items()
-                }
+                self.freq_dict = {k: v + freq_dict[k] for k, v in self.freq_dict.items()}
 
                 for i in range(self.num_threads - 1):
                     pid, worker_memory, worker_logger, freq_dict = queue.get()
                     memories[pid] = worker_memory
                     loggers[pid] = worker_logger
 
-                    self.freq_dict = {
-                        k: v + freq_dict[k] for k, v in self.freq_dict.items()
-                    }
+                    self.freq_dict = {k: v + freq_dict[k] for k, v in self.freq_dict.items()}
 
                 # print(np.sum([len(v) for k, v in self.freq_dict.items()]), np.mean(np.concatenate([self.freq_dict[k] for k in self.freq_dict.keys()])))
                 traj_batch = self.traj_cls(memories)
                 logger = self.logger_cls.merge(loggers)
 
-        self.freq_dict = {
-            k: v if len(v) < self.max_freq else v[-self.max_freq :]
-            for k, v in self.freq_dict.items()
-        }
+        self.freq_dict = {k: v if len(v) < self.max_freq else v[-self.max_freq:] for k, v in self.freq_dict.items()}
         logger.sample_time = time.time() - t_start
         return traj_batch, logger

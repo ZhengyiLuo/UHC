@@ -22,8 +22,10 @@ from uhc.smpllib.smpl_mujoco import smpl_to_qpose
 from tqdm import tqdm
 from uhc.khrylib.utils import *
 
+
 ## AMASS Datatset with a Single input sequence
 class DatasetAMASSSingle:
+
     def __init__(self, data_specs, data_mode="train"):
         print("******* Reading AMASS Class Data, Single Instance! ***********")
         np.random.seed(0)  # train test split need to stabilize
@@ -43,9 +45,7 @@ class DatasetAMASSSingle:
 
         self.mode = data_specs.get("mode", "all")
         self.adaptive_iter = data_specs.get("adaptive_iter", -1)
-        self.netural_path = data_specs.get(
-            "neutral_path", "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl"
-        )
+        self.netural_path = data_specs.get("neutral_path", "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl")
         self.netural_data = joblib.load(self.netural_path)
         self.data_mode = data_mode
 
@@ -98,30 +98,16 @@ class DatasetAMASSSingle:
             if "qpos" in v:
                 data_out["qpos"][k] = v["qpos"]
 
-            data_out["trans"][k] = (
-                v["trans"]
-                if v["trans"].shape[0] == v["pose_aa"].shape[0]
-                else v["qpos"][:, :3]
-            )  # ZL: bug fix on some preprocessed dataset, can be removed
+            data_out["trans"][k] = (v["trans"] if v["trans"].shape[0] == v["pose_aa"].shape[0] else v["qpos"][:, :3])  # ZL: bug fix on some preprocessed dataset, can be removed
 
             # data_out["qpos"][k] = v["qpos"]
-            data_out["beta"][k] = (
-                np.repeat(
-                    v["beta"][
-                        None,
-                    ],
-                    seq_len,
-                    axis=0,
-                )
-                if v["beta"].shape[0] != seq_len
-                else v["beta"]
-            )
+            data_out["beta"][k] = (np.repeat(
+                v["beta"][None,],
+                seq_len,
+                axis=0,
+            ) if v["beta"].shape[0] != seq_len else v["beta"])
 
-            gender = (
-                v["gender"].item()
-                if isinstance(v["gender"], np.ndarray)
-                else v["gender"]
-            )
+            gender = (v["gender"].item() if isinstance(v["gender"], np.ndarray) else v["gender"])
             if isinstance(gender, bytes):
                 gender = gender.decode("utf-8")
             if gender == "neutral":
@@ -140,11 +126,7 @@ class DatasetAMASSSingle:
                 seq_len,
                 axis=0,
             )
-            data_out["obj_pose"][k] = (
-                v["obj_pose"]
-                if ("obj_pose" in v) and (not v["obj_pose"] is None)
-                else v["pose_aa"]
-            )
+            data_out["obj_pose"][k] = (v["obj_pose"] if ("obj_pose" in v) and (not v["obj_pose"] is None) else v["pose_aa"])
             if "obj_info" in v:
                 data_out["obj_info"][k] = np.array(v["obj_info"])
 
@@ -152,10 +134,7 @@ class DatasetAMASSSingle:
                 data_out["v_template"][k] = np.array(v["v_template"])
             # data_out['entry_names'][k] = k
             if self.t_max != -1:
-                [
-                    self.sample_keys.append((k, [-1]))
-                    for i in range(smpl_squence.shape[0] // self.t_max + 1)
-                ]
+                [self.sample_keys.append((k, [-1])) for i in range(smpl_squence.shape[0] // self.t_max + 1)]
             else:
                 self.sample_keys.append((k, [-1]))
 
@@ -165,20 +144,16 @@ class DatasetAMASSSingle:
         print("Removed Keys:", remove_keys)
         return data_out
 
-    def hard_negative_mining(
-        self, value_net, env, device, dtype, running_state=None, sampling_temp=0.2
-    ):
+    def hard_negative_mining(self, value_net, env, device, dtype, running_state=None, sampling_temp=0.2):
         print("Hard negative mininig..")
         self.init_values = []
         self.init_info = []
         with torch.no_grad():
             for k, v in tqdm(self.states.items()):
                 if v.shape[0] > self.t_min:
-                    curr_seq = v[: -self.t_min]
+                    curr_seq = v[:-self.t_min]
                     if running_state != None:
-                        curr_seq = (curr_seq - running_state.rs.mean[None, :]) / (
-                            running_state.rs.std[None, :] + 1e-8
-                        )
+                        curr_seq = (curr_seq - running_state.rs.mean[None, :]) / (running_state.rs.std[None, :] + 1e-8)
                     state_seq = torch.from_numpy(curr_seq).type(dtype).to(device)
                     curr_values = value_net(state_seq)
                     self.init_values.append(curr_values.cpu().numpy())
@@ -203,23 +178,9 @@ class DatasetAMASSSingle:
             sample = random.choice(self.sample_keys)
             self.curr_key = curr_key = sample[0]
         else:
-            init_probs = np.exp(
-                -np.array(
-                    [
-                        ewma(np.array(freq_dict[k])[:, 0] == 1)
-                        if len(freq_dict[k]) > 0
-                        else 0
-                        for k in freq_dict.keys()
-                    ]
-                )
-                / sampling_temp
-            )
+            init_probs = np.exp(-np.array([ewma(np.array(freq_dict[k])[:, 0] == 1) if len(freq_dict[k]) > 0 else 0 for k in freq_dict.keys()]) / sampling_temp)
             init_probs = init_probs / init_probs.sum()
-            self.curr_key = curr_key = (
-                np.random.choice(self.data_keys, p=init_probs)
-                if np.random.binomial(1, sampling_freq)
-                else np.random.choice(self.data_keys)
-            )
+            self.curr_key = curr_key = (np.random.choice(self.data_keys, p=init_probs) if np.random.binomial(1, sampling_freq) else np.random.choice(self.data_keys))
 
         curr_pose_aa = self.data["pose_aa"][self.curr_key]
         seq_len = curr_pose_aa.shape[0]
@@ -257,11 +218,7 @@ class DatasetAMASSSingle:
         else:
             if not freq_dict is None and precision_mode:
                 perfs = np.array(freq_dict[take_key])
-                if (
-                    len(perfs) > 0
-                    and len(perfs[perfs[:, 0] != 1][:, 1]) > 0
-                    and np.random.binomial(1, sampling_freq)
-                ):
+                if (len(perfs) > 0 and len(perfs[perfs[:, 0] != 1][:, 1]) > 0 and np.random.binomial(1, sampling_freq)):
                     perfs = perfs[perfs[:, 0] != 1][:, 1]
                     chosen_idx = np.random.choice(perfs)
                     self.fr_start = fr_start = np.random.randint(
@@ -269,19 +226,13 @@ class DatasetAMASSSingle:
                         min(chosen_idx + 20, seq_len - self.t_min),
                     )
                 else:
-                    self.fr_start = fr_start = np.random.randint(
-                        0, seq_len - self.t_min
-                    )
+                    self.fr_start = fr_start = np.random.randint(0, seq_len - self.t_min)
             elif fr_start == -1:
                 self.fr_start = fr_start = np.random.randint(0, seq_len - self.t_min)
             else:
                 self.fr_start = fr_start
 
-            self.fr_end = fr_end = (
-                fr_start + self.t_max
-                if (fr_start + self.t_max < seq_len and self.t_max != -1)
-                else seq_len
-            )
+            self.fr_end = fr_end = (fr_start + self.t_max if (fr_start + self.t_max < seq_len and self.t_max != -1) else seq_len)
         sample = {}
         for key in self.data.keys():
             if not key in exclude_keys:
@@ -296,7 +247,6 @@ class DatasetAMASSSingle:
 
         if "v_template" in self.data:
             sample["v_template"] = self.data["v_template"][self.curr_key]
-
         return sample
 
     def get_sample_len_from_key(self, take_key):
@@ -339,9 +289,7 @@ class DatasetAMASSSingle:
         quat_delta = quaternion_multiply(q_target, quaternion_inverse(qpose_start[3:7]))
         qposes[:, 3:7] = quaternion_multiply_batch(
             np.repeat(
-                quat_delta[
-                    None,
-                ],
+                quat_delta[None,],
                 qposes.shape[0],
                 axis=0,
             ),
@@ -350,9 +298,7 @@ class DatasetAMASSSingle:
 
         start_xy = qposes[0, :2].copy()
         # qposes[:,:2] -= qposes[0, :2]
-        qposes[:, :3] = transform_vec_batch(
-            qposes[:, :3], quaternion_inverse(quat_delta)
-        ).T
+        qposes[:, :3] = transform_vec_batch(qposes[:, :3], quaternion_inverse(quat_delta)).T
         # qposes[:,:2] += start_xy
 
         return qposes
@@ -364,9 +310,7 @@ class DatasetAMASSSingle:
         return qpos
 
     def iter_generator(self, batch_size=8, num_workers=8):
-        loader = torch.utils.data.DataLoader(
-            self, batch_size=batch_size, shuffle=False, num_workers=num_workers
-        )
+        loader = torch.utils.data.DataLoader(self, batch_size=batch_size, shuffle=False, num_workers=num_workers)
         return loader
 
 

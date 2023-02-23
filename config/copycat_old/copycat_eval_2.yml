@@ -17,14 +17,14 @@ value_lr: 3.e-4
 value_momentum: 0.0
 value_weightdecay: 0.0
 clip_epsilon: 0.2
-min_batch_size: 50000
-mini_batch_size: 32768
+min_batch_size: 5
+mini_batch_size: 5
 num_optim_epoch: 10
 log_std: -2.3
 fix_std: true
 num_epoch: 30000
 seed: 1
-save_n_epochs: 100
+save_n_epochs: 1
 reward_id: "world_rfc_implicit"
 obs_type: "full"
 actor_type: "mcp"
@@ -52,6 +52,7 @@ reward_weights:
 data_specs:
   dataset_name: amass
   file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take5_train.pkl
+  # file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test.pkl
   # file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_test.pkl
   state_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_states.pkl
   # state_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_test_states.pkl
@@ -60,7 +61,7 @@ data_specs:
   # test_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take2_test_singles.pkl
   # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_mocap_qpos_grad.pkl
   # test_file_path: /hdd/zen/data/ActBound/AMASS/egopose_mocap_qpos_grad.pkl
-  test_file_path: /hdd/zen/data/ActBound/AMASS/h36m_train_no_sit_30_qpos.pkl
+  # test_file_path: /hdd/zen/data/ActBound/AMASS/h36m_train_no_sit_30_qpos.pkl
   # test_file_path: /hdd/zen/data/ActBound/AMASS/h36m_train_30_qpos.pkl
   # test_file_path: "/hdd/zen/data/ActBound/AMASS/prox_sample.pkl"
   # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_ar_qpos.pkl

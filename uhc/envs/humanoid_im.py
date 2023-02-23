@@ -153,9 +153,11 @@ class HumanoidEnv(mujoco_env.MujocoEnv):
 
     def reset_robot(self):
         beta = self.expert["beta"].copy()
-        if not self.cc_cfg.has_shape:
-            beta = np.zeros((1, 16))  # no shape variation
+
         gender = self.expert["gender"].copy()
+        if not self.cc_cfg.has_shape:
+            beta[:] = 0
+            gender[:] = 0
         obj_info = self.expert.get("obj_info", None)
         obj_pose = self.expert.get("obj_pose", None)
 
@@ -167,7 +169,6 @@ class HumanoidEnv(mujoco_env.MujocoEnv):
                 obj_pose=obj_pose,
             )
         else:
-            # import ipdb; ipdb.set_trace()
             self.smpl_robot.load_from_skeleton(torch.tensor(beta[0:1, :]).float(), gender=gender, objs_info=obj_info)
 
         xml_str = self.smpl_robot.export_xml_string().decode("utf-8")
