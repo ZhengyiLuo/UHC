@@ -1,5 +1,5 @@
 # data
-notes: "Training UHC. no rfc"
+notes: "Training UHC. With expilicit rfc."
 
 # training parameters
 gamma: 0.95
@@ -17,14 +17,14 @@ value_lr: 3.e-4
 value_momentum: 0.0
 value_weightdecay: 0.0
 clip_epsilon: 0.2
-min_batch_size: 5
-mini_batch_size: 5
+min_batch_size: 50000
+mini_batch_size: 32768
 num_optim_epoch: 10
 log_std: -2.3
 fix_std: true
 num_epoch: 30000
 seed: 1
-save_n_epochs: 1
+save_n_epochs: 100
 reward_id: "world_rfc_implicit"
 obs_type: "full"
 actor_type: "mcp"
