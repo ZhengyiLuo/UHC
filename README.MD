@@ -33,6 +33,7 @@ To create the environment, follow the following instructions:
 ```
 conda create -n uhc python=3.8
 conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
+pip install -r requirements.txt
 ```
 
 2. Download and setup mujoco: [Mujoco](http://www.mujoco.org/)
