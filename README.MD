@@ -10,7 +10,6 @@ TODOS:
 
 
 
-...
 
 <div float="center">
   <img src="assets/gif/teaser.gif" />
@@ -19,6 +18,7 @@ TODOS:
 ## News 🚩
 
 [February 24, 2023 ] Full code runnable
+
 [February 22, 2023 ] Evaluation code released
 
 
