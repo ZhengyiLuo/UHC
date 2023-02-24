@@ -16,6 +16,13 @@ TODOS:
   <img src="assets/gif/teaser.gif" />
 </div>
 
+## News 🚩
+
+[February 24, 2023 ] Full code runnable
+[February 22, 2023 ] Evaluation code released
+
+
+
 ## Introduction 
 
 In this project, we develop the Universal Humanoid Controller used in our projects: [embodiedpose](https://zhengyiluo.github.io/projects/embodied_pose/), [kin_poly](https://zhengyiluo.github.io/projects/kin_poly/), and [agent_design](https://zhengyiluo.github.io/projects/agent_design/). It is a physics-based humanoid controller trained with Reinforcement Learning to imitate reference human motion. UHC is task-agnostic and only takes reference frames as input. We uses the MuJoCo simulator for this repository. It relives heavily on [residual force control](https://github.com/Khrylx/RFC) for keeping the humanoid stable, and we are actively working on relying less on this dependency. Here are a few highlights of the controller:
@@ -32,7 +39,7 @@ To create the environment, follow the following instructions:
 1. Create new conda environment and install pytroch:
 ```
 conda create -n uhc python=3.8
-conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
+conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia # install pytorch
 pip install -r requirements.txt
 ```
 

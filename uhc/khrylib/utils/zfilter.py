@@ -5,6 +5,7 @@ import numpy as np
 
 
 class RunningStat(object):
+
     def __init__(self, shape):
         self._n = 0
         self._M = np.zeros(shape)

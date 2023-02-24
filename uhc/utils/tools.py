@@ -1,6 +1,21 @@
 from uhc.khrylib.utils import *
 from uhc.utils.math_utils import *
 from collections import defaultdict
+import pickle
+
+
+class CustomUnpickler(pickle.Unpickler):
+    # ZL: Patching module name changes
+
+    def find_class(self, module, name):
+        if name == 'ZFilter':
+            from uhc.khrylib.utils.zfilter import ZFilter
+            return ZFilter
+        elif name == 'RunningStat':
+            from uhc.khrylib.utils.zfilter import RunningStat
+            return RunningStat
+
+        return super().find_class(module, name)
 
 
 def get_expert(expert_qpos, expert_meta, env):
@@ -45,9 +60,7 @@ def get_expert(expert_qpos, expert_meta, env):
             qvel = get_qvel_fd_new(prev_qpos, qpos, env.dt)
             qvel = qvel.clip(-10.0, 10.0)
             rlinv = qvel[:3].copy()
-            rlinv_local = transform_vec(
-                qvel[:3].copy(), qpos[3:7], env.cc_cfg.obs_coord
-            )
+            rlinv_local = transform_vec(qvel[:3].copy(), qpos[3:7], env.cc_cfg.obs_coord)
             rangv = qvel[3:6].copy()
             expert["qvel"].append(qvel)
             expert["rlinv"].append(rlinv)
@@ -112,7 +125,7 @@ def get_expert_master(expert_qpos, expert_meta, env):
     }
     for i in range(expert_qpos.shape[0]):
         qpos = expert_qpos[i]
-        env.data.qpos[: env.qpos_lim] = qpos
+        env.data.qpos[:env.qpos_lim] = qpos
         env.sim.forward()
         rq_rmh = de_heading(qpos[3:7])
         ee_pos = env.get_ee_pos(env.cc_cfg.obs_coord)
@@ -130,9 +143,7 @@ def get_expert_master(expert_qpos, expert_meta, env):
             qvel = get_qvel_fd_new(prev_qpos, qpos, env.dt)
             qvel = qvel.clip(-10.0, 10.0)
             rlinv = qvel[:3].copy()
-            rlinv_local = transform_vec(
-                qvel[:3].copy(), qpos[3:7], env.cc_cfg.obs_coord
-            )
+            rlinv_local = transform_vec(qvel[:3].copy(), qpos[3:7], env.cc_cfg.obs_coord)
             rangv = qvel[3:6].copy()
             expert["qvel"].append(qvel)
             expert["rlinv"].append(rlinv)

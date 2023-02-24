@@ -45,8 +45,7 @@ from uhc.smpllib.smpl_parser import SMPL_BONE_ORDER_NAMES
 from uhc.smpllib.smpl_eval import compute_metrics
 from uhc.utils.flags import flags
 import multiprocessing
-
-# import torch.multiprocessing as multiprocessing
+from uhc.utils.tools import CustomUnpickler
 
 
 class AgentCopycat(AgentPPO):
@@ -231,7 +230,7 @@ class AgentCopycat(AgentPPO):
         cfg = self.cfg
         cp_path_best = f"{cfg.model_dir}/iter_best.p"
         self.logger.info("loading model from checkpoint: %s" % cp_path_best)
-        model_cp = pickle.load(open(cp_path_best, "rb"))
+        model_cp = CustomUnpickler(open(cp_path_best, "rb")).load()
         self.policy_net.load_state_dict(model_cp["policy_dict"])
         self.value_net.load_state_dict(model_cp["value_dict"])
         self.running_state = model_cp["running_state"]
@@ -242,7 +241,7 @@ class AgentCopycat(AgentPPO):
         if epoch > 0:
             cp_path = f"{cfg.model_dir}/iter_{(epoch+ 1):04d}_{key}.p"
             self.logger.info("loading model from checkpoint: %s" % cp_path)
-            model_cp = pickle.load(open(cp_path, "rb"))
+            model_cp = CustomUnpickler(open(cp_path, "rb")).load()
             self.policy_net.load_state_dict(model_cp["policy_dict"])
             self.value_net.load_state_dict(model_cp["value_dict"])
             self.running_state = model_cp["running_state"]
@@ -253,7 +252,7 @@ class AgentCopycat(AgentPPO):
         if iter > 0:
             cp_path = "%s/iter_%04d.p" % (cfg.model_dir, iter)
             self.logger.info("loading model from checkpoint: %s" % cp_path)
-            model_cp = pickle.load(open(cp_path, "rb"))
+            model_cp = CustomUnpickler(open(cp_path, "rb")).load()
             self.policy_net.load_state_dict(model_cp["policy_dict"])
             self.value_net.load_state_dict(model_cp["value_dict"])
             self.running_state = model_cp["running_state"]
@@ -358,7 +357,8 @@ class AgentCopycat(AgentPPO):
 
         res_dicts = []
         for data_loader in data_loaders:
-            num_jobs = self.num_threads
+            num_jobs = 20
+            # num_jobs = self.num_threads
             jobs = data_loader.data_keys
             chunk = np.ceil(len(jobs) / num_jobs).astype(int)
             jobs = [jobs[i:i + chunk] for i in range(0, len(jobs), chunk)]
