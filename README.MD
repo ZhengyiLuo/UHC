@@ -1,7 +1,5 @@
 # UHC: Universal Humanoid Controller
 
-> Repo under construction.  
-
 TODOS:
 
 - [x] Tutorial for smpl_robot
