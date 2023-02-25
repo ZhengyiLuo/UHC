@@ -1402,10 +1402,7 @@ class HumanoidEnv(mujoco_env.MujocoEnv):
         e_wbpos = self.get_expert_joint_pos().reshape(-1, 3)
         diff = cur_wbpos - e_wbpos
         diff *= self.jpos_diffw
-        # jpos_dist = np.linalg.norm(
-        #     diff[self.jpos_diffw.squeeze().astype(bool)], axis=1
-        # ).mean()  # Taking the mean since we want to make sure the number of joints does not affect (as compared to sum). Should we just do Max??
-        jpos_dist = np.linalg.norm(diff[self.jpos_diffw.squeeze().astype(bool)], axis=1).max()  # Taking the mean since we want to make sure the number of joints does not affect (as compared to sum). Should we just do Max??
+        jpos_dist = np.linalg.norm(diff[self.jpos_diffw.squeeze().astype(bool)], axis=1).mean()  # Taking the mean since we want to make sure the number of joints does not affect (as compared to sum)
 
         return jpos_dist
 
