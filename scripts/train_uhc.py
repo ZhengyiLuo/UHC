@@ -36,7 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--cfg", default=None)
     parser.add_argument("--render", action="store_true", default=False)
     parser.add_argument("--test", action="store_true", default=False)
-    parser.add_argument("--num_threads", type=int, default=45)
+    parser.add_argument("--num_threads", type=int, default=30)
     parser.add_argument("--gpu_index", type=int, default=0)
     parser.add_argument("--epoch", type=int, default=0)
     parser.add_argument("--show_noise", action="store_true", default=False)

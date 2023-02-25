@@ -173,7 +173,6 @@ class DatasetAMASSSingle:
         sampling_freq=0.5,
         precision_mode=False,
     ):
-
         if freq_dict is None or len(freq_dict.keys()) != len(self.data_keys):
             sample = random.choice(self.sample_keys)
             self.curr_key = curr_key = sample[0]

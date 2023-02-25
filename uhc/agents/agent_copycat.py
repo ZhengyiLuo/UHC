@@ -377,7 +377,7 @@ class AgentCopycat(AgentPPO):
                         data_res_coverage.update(res)
 
                 for k, res in data_res_coverage.items():
-                    [self.freq_dict[k].append([res["succ"], 0]) for _ in range(1 if res["succ"] else 3) if k in self.freq_dict]
+                    [self.freq_dict[k].append([res["succ"][0], 0]) for _ in range(1 if res["succ"][0] else 3) if k in self.freq_dict]  # first item is scuccess or not, second indicates the frame number
 
                 metric_names = [
                     "mpjpe",
