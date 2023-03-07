@@ -64,27 +64,7 @@ joints_to_use = np.array(
 )
 joints_to_use = np.arange(0, 156).reshape((-1, 3))[joints_to_use].reshape(-1)
 
-all_sequences = [
-    "ACCAD",
-    "BMLmovi",
-    "BioMotionLab_NTroje",
-    "CMU",
-    "DFaust_67",
-    "EKUT",
-    "Eyes_Japan_Dataset",
-    "HumanEva",
-    "KIT",
-    "MPI_HDM05",
-    "MPI_Limits",
-    "MPI_mosh",
-    "SFU",
-    "SSM_synced",
-    "TCD_handMocap",
-    "TotalCapture",
-    "Transitions_mocap",
-    "BMLhandball",
-    "DanceDB"
-]
+all_sequences = ["CMU"]
 
 
 def read_data(folder, sequences):
