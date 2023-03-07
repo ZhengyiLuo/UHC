@@ -48,15 +48,8 @@ def sample_seq_length(seq, tran, seq_length = 150):
     return seqs, trans, start_points
 
 if __name__ == "__main__":
-    amass_base = "/insert_directory_here/"
-    # amass_cls_data = pk.load(open(os.path.join(amass_base, "amass_class.pkl"), "rb"))
     amass_seq_data = {}
     seq_length = -1
-    cfg = Config("uhc_5", "train", create_dirs=False)
-
-    data_loader = DatasetAMASSSingle(cfg.data_specs, data_mode="test")
-    init_expert = data_loader.sample_seq()
-    env = HumanoidEnv(cfg, init_expert = init_expert, data_specs = cfg.data_specs, mode="test")
 
     # target_frs = [20,30,40] # target framerate
     target_frs = [30] # target framerate
@@ -92,11 +85,6 @@ if __name__ == "__main__":
         seqs, start_points, trans = [],[],[]
         for skip in skips:
             seqs_org, trans_org, start_points_org = sample_seq_length(amass_pose[::skip], amass_trans[::skip], seq_length)
-            # seqs_flip, trans_flip, start_points_flip = sample_seq_length(amass_pose_flip[::skip], amass_trans[::skip], seq_length)
-            # seqs = seqs + seqs_org + seqs_flip 
-            # trans = trans + trans_org + trans_flip
-            # start_points = start_points + start_points_org + start_points_flip 
-
             seqs = seqs + seqs_org 
             trans = trans + trans_org 
             start_points = start_points + start_points_org
@@ -104,11 +92,11 @@ if __name__ == "__main__":
         seq_counter += len(seqs)
         for idx in range(len(seqs)):
             pose_aa = torch.tensor(seqs[idx])      
-    #         if curr_seq.shape[0] != seq_length: break
             curr_trans = trans[idx]
             
-            pose_seq_6d = convert_aa_to_orth6d(torch.tensor(pose_aa)).reshape(-1, 144)
-            qpos = smpl_to_qpose(pose = pose_aa, model = humanoid_model, trans = curr_trans)
+            pose_seq_6d = convert_aa_to_orth6d(torch.tensor(pose_aa))
+            pose_seq_6d = pose_seq_6d.reshape(pose_seq_6d.shape[0],-1,3)
+   
             seq_name =  f"{idx}-{k}"
 
             expert_meta = {
@@ -120,12 +108,10 @@ if __name__ == "__main__":
                 amass_seq_data[seq_name] = {
                     "pose_aa": pose_aa.numpy(),
                     "pose_6d":pose_seq_6d.numpy(),
-                    "qpos": qpos,
                     'trans': curr_trans,
                     'beta': betas[:10],
                     "seq_name": seq_name,
-                    "gender": gender,
-                    "expert": expert_res
+                    "gender": gender
                 }
 
                 counter += 1
@@ -133,6 +119,5 @@ if __name__ == "__main__":
         # if counter > 1000:
             # break
     amass_output_file_name = "/insert_directory_here/amass_qpos_30.pkl"
-    # amass_output_file_name = "/insert_directory_here/amass_{}.pkl".format(take_num)
     print(amass_output_file_name, len(amass_seq_data))
     joblib.dump(amass_seq_data, open(amass_output_file_name, "wb"))
