@@ -42,9 +42,9 @@ def run_seq(seqs):
 if __name__ == "__main__":
     # cfg = Config("copycat_19", False, create_dirs=False)
     cfg = Config("copycat_9", False, create_dirs=False)
-    # cfg.data_specs['test_file_path'] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take3_test.pkl"
-    # cfg.data_specs['test_file_path'] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take3.pkl"
-    cfg.data_specs['test_file_path'] = "/hdd/zen/data/ActBound/AMASS/relive_copycat.pkl"
+    # cfg.data_specs['test_file_path'] = "sample_data/amass_copycat_take3_test.pkl"
+    # cfg.data_specs['test_file_path'] = "sample_data/amass_copycat_take3.pkl"
+    cfg.data_specs['test_file_path'] = "sample_data/relive_copycat.pkl"
     data_loader = DatasetAMASSSingle(cfg.data_specs, data_mode="test")
     init_expert = data_loader.sample_seq()
     env = HumanoidEnv(cfg, init_expert = init_expert, data_specs = cfg.data_specs, mode="test")
@@ -72,8 +72,8 @@ if __name__ == "__main__":
         pool.join()
     
     [data_res_full.update(j) for j in job_res]
-    joblib.dump(data_res_full, "/hdd/zen/data/ActBound/AMASS/relive_copycat_states.pkl")
-    # joblib.dump(data_res_full, "/hdd/zen/data/ActBound/AMASS/amass_copycat_take3_states_obs_v2.pkl")
-    # joblib.dump(data_res_full, "/hdd/zen/data/ActBound/AMASS/amass_copycat_take3_test_states.pkl")
+    joblib.dump(data_res_full, "sample_data/relive_copycat_states.pkl")
+    # joblib.dump(data_res_full, "sample_data/amass_copycat_take3_states_obs_v2.pkl")
+    # joblib.dump(data_res_full, "sample_data/amass_copycat_take3_test_states.pkl")
     
 

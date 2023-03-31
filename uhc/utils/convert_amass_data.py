@@ -34,7 +34,7 @@ model_file = "assets/mujoco_models/%s.xml" % args.model_id
 model = load_model_from_path(model_file)
 body_qposaddr = get_body_qposaddr(model)
 # orig_data = pickle.load(open(os.path.expanduser('~/datasets/h36m/data_pose_h36m.p'), 'rb'))
-amass_db = joblib.load("/hdd/zen/data/ActBound/AMASS/amass_db.pt")
+amass_db = joblib.load("sample_data/amass_db.pt")
 
 
 def smpl_to_qpose(pose, trans, joint_idx):

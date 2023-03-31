@@ -45,7 +45,7 @@ class DatasetSMPLObj():
         self.to_one_hot = data_specs.get("to_one_hot", True)
         self.mode = data_specs.get("mode", "all")
         self.adaptive_iter = data_specs.get("adaptive_iter", -1)
-        self.netural_path = data_specs.get("neutral_path", "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl")
+        self.netural_path = data_specs.get("neutral_path", "sample_data/standing_neutral.pkl")
         self.netural_data = joblib.load(self.netural_path)
         self.data_mode = data_mode
 
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     data_specs = {
         "dataset_name": "amass_rf",
-        "file_path": "/hdd/zen/data/ActBound/AMASS/amass_copycat_take1_test.pkl",
+        "file_path": "sample_data/amass_copycat_take1_test.pkl",
         "flip_cnd": 0,
         "has_smpl_root": True,
         "traj_dim": 144,

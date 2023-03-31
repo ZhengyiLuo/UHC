@@ -131,7 +131,7 @@ def process_qpos_list(qpos_list):
 
 
 if __name__ == "__main__":
-    amass_base = "/hdd/zen/data/ActBound/AMASS/"
+    amass_base = "sample_data/"
     # amass_cls_data = pk.load(open(os.path.join(amass_base, "amass_class.pkl"), "rb"))
     amass_seq_data = {}
     seq_length = -1
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     target_frs = [30]  # target framerate
     counter = 0
     seq_counter = 0
-    amass_db = joblib.load("/hdd/zen/data/ActBound/AMASS/amass_db.pt")
+    amass_db = joblib.load("sample_data/amass_db.pt")
 
     model_file = f"assets/mujoco_models/humanoid_smpl_neutral_mesh.xml"
     humanoid_model = load_model_from_path(model_file)
@@ -181,10 +181,10 @@ if __name__ == "__main__":
 
     # try:
     #     [amass_seq_data.update(j) for j in job_res]
-    #     # amass_output_file_name = "/hdd/zen/data/ActBound/AMASS/amass_qpos_30.pkl"
-    #     # amass_output_file_name = "/hdd/zen/data/ActBound/AMASS/amass_qpos_test.pkl"
-    #     amass_output_file_name = "/hdd/zen/data/ActBound/AMASS/amass_qpos.pkl"
-    #     # amass_output_file_name = "/hdd/zen/data/ActBound/AMASS/amass_{}.pkl".format(take_num)
+    #     # amass_output_file_name = "sample_data/amass_qpos_30.pkl"
+    #     # amass_output_file_name = "sample_data/amass_qpos_test.pkl"
+    #     amass_output_file_name = "sample_data/amass_qpos.pkl"
+    #     # amass_output_file_name = "sample_data/amass_{}.pkl".format(take_num)
     #     print(amass_output_file_name, len(amass_seq_data))
     #     joblib.dump(amass_seq_data, open(amass_output_file_name, "wb"),  compress=9, protocol=4)
     # except:

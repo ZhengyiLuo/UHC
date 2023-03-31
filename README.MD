@@ -4,7 +4,7 @@ TODOS:
 
 - [x] Tutorial for smpl_robot
 - [x] Runnable and trainalbe code for the SMPL model for motion imitation 
-- [ ] Data processing code for the AMASS dataset
+- [x] Data processing code for the AMASS dataset
 
 
 
@@ -14,6 +14,8 @@ TODOS:
 </div>
 
 ## News 🚩
+
+[March 31, 2023 ] Adding the implicit-shape model. Implicit RFC + training with different SMPL body shapes. Adding AMASS data processing code.
 
 [February 24, 2023 ] Full code runnable
 
@@ -62,9 +64,26 @@ python uhc/smpllib/smpl_robot.py
 You will need to have downloaded smpl model files from [SMPL](https://smpl.is.tue.mpg.de/), [SMPL-H](https://smpl.is.tue.mpg.de/downloads), and [SMPL-X](https://smpl-x.is.tue.mpg.de/downloads).
 
 
-## Data processing for training UHC
+## Data processing for training & evaluating UHC
 
-TBD
+UHC is trained on the AMASS dataset. First, download the AMASS dataset from [AMASS](https://amass.is.tue.mpg.de/). Then, run the following script on the unzipped data:
+ 
+
+```
+python uhc/data_process/process_amass_raw.py
+```
+
+which dumps the data into the `amass_db_smplh.pt` file. Then, run 
+
+```
+python uhc/data_process/process_amass_db.py
+```
+
+For processing your own SMPL data for evaluation, you can refer to 
+```
+python uhc/data_process/process_smpl_data.py
+```
+
 
 ## Trained models
 
@@ -80,6 +99,7 @@ bash download_data.sh
 ## Evaluation
 ```
 python scripts/eval_uhc.py --cfg uhc_implicit --epoch 19000 --data sample_data/amass_copycat_take5_test_small.pkl
+python scripts/eval_uhc.py --cfg uhc_implicit_shape --epoch 4700 --data sample_data/amass_copycat_take5_test_small.pkl
 python scripts/eval_uhc.py --cfg uhc_explicit --epoch 5000 --data sample_data/amass_copycat_take5_test_small.pkl
 ```
 

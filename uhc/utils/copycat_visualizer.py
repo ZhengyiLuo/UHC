@@ -48,9 +48,9 @@ class CopycatVisualizer(Visualizer):
     def data_generator(self):
 
         if self.agent.cfg.mode != "disp_stats":
+
             for loader in self.agent.test_data_loaders:
                 for take_key in loader.data_keys:
-
                     self.cur_key = take_key
                     print(f"Generating for {take_key} seqlen: {loader.get_sample_len_from_key(take_key)}")
                     eval_res = self.agent.eval_seq(take_key, loader)

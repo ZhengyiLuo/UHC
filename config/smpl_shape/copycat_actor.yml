@@ -57,13 +57,13 @@ reward_weights:
 data_specs:
   dataset_name: amass
   train_files_path: 
-    - /hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test.pkl
+    - sample_data/amass_copycat_take5_test.pkl
   test_files_path:
-    - /hdd/zen/data/ActBound/AMASS/amass_copycat_take5_single.pkl
-  state_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_states_obs_v2.pkl
+    - sample_data/amass_copycat_take5_single.pkl
+  state_file_path: sample_data/amass_copycat_take3_states_obs_v2.pkl
   
 
-  neutral_path: /hdd/zen/data/ActBound/AMASS/standing_neutral.pkl
+  neutral_path: sample_data/standing_neutral.pkl
   flip_cnd: 0
   has_smpl_root: true
   traj_dim: 144

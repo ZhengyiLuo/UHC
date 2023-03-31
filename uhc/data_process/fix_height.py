@@ -93,7 +93,7 @@ def fix_height_smpl(pose_aa, th_trans, th_betas, gender, seq_name):
 
 if __name__ == "__main__":
     np.random.seed(0)
-    amass_base = "/hdd/zen/data/ActBound/AMASS/"
+    amass_base = "sample_data/"
     take_num = "copycat_take5"
     amass_seq_data = {}
     seq_length = -1
@@ -113,8 +113,8 @@ if __name__ == "__main__":
                                  gender="female",
                                  use_pca=False,
                                  create_transl=False)
-    data_all = joblib.load("/hdd/zen/data/ActBound/AMASS/h36m_all_sit_30_qpos.pkl")
-    # data_all = joblib.load("/hdd/zen/data/ActBound/AMASS/kinpoly_mocap_smpl_grad_test.pkl")
+    data_all = joblib.load("sample_data/h36m_all_sit_30_qpos.pkl")
+    # data_all = joblib.load("sample_data/kinpoly_mocap_smpl_grad_test.pkl")
 
     for k, v in tqdm(data_all.items()):
         
@@ -126,5 +126,5 @@ if __name__ == "__main__":
                         # "neutral", 
                         k)
         v['trans']  = new_trans.cpu().numpy()
-    joblib.dump(data_all, "/hdd/zen/data/ActBound/AMASS/h36m_all_sit_30_qpos_height.pkl")
-    # joblib.dump(data_all, "/hdd/zen/data/ActBound/AMASS/kinpoly_mocap_smpl_grad_height.pkl")
+    joblib.dump(data_all, "sample_data/h36m_all_sit_30_qpos_height.pkl")
+    # joblib.dump(data_all, "sample_data/kinpoly_mocap_smpl_grad_height.pkl")

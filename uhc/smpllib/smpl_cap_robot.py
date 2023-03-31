@@ -1912,7 +1912,7 @@ if __name__ == "__main__":
     params_names = smpl_robot.get_params(get_name=True)
 
 
-    grab_data = joblib.load("/hdd/zen/data/ActBound/AMASS/grab_take1.pkl")
+    grab_data = joblib.load("sample_data/grab_take1.pkl")
     key = "flashlight_lift"
     # obj_info = grab_data[key]["obj_info"]
     # obj_pose = grab_data[key]["obj_pose"]

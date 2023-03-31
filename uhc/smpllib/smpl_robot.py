@@ -73,12 +73,9 @@ def polar_to_vec(p):
 def in_hull(hull, queries):
     tolerance = 1e-3
     if len(queries.shape) == 1:
-        queries = queries[
-            None,
-        ]
+        queries = queries[None,]
     return np.all(
-        np.add(np.dot(queries, hull.equations[:, :-1].T), hull.equations[:, -1])
-        <= tolerance,
+        np.add(np.dot(queries, hull.equations[:, :-1].T), hull.equations[:, -1]) <= tolerance,
         axis=1,
     )
 
@@ -90,9 +87,9 @@ def get_joint_geometries(
     joint_names,
     geom_dir,
     scale_dict={},
-    suffix = None,
+    suffix=None,
     verbose=False,
-    min_num_vert = 50,
+    min_num_vert=50,
 ):
 
     vert_to_joint = skin_weights.argmax(axis=1)
@@ -106,9 +103,7 @@ def get_joint_geometries(
         if len(vind) == 0:
             print(f"{jname} has no vertices!")
             continue
-        vert = (smpl_verts[vind] - smpl_jts[jind]) * scale_dict.get(
-            jname, 1
-        ) + smpl_jts[jind]
+        vert = (smpl_verts[vind] - smpl_jts[jind]) * scale_dict.get(jname, 1) + smpl_jts[jind]
 
         hull = ConvexHull(vert)
 
@@ -153,6 +148,7 @@ def get_joint_geometries(
 
 
 class Joint:
+
     def __init__(self, node, body):
         self.node = node
         self.body = body
@@ -162,9 +158,7 @@ class Joint:
         self.type = node.attrib["type"]
         if self.type == "hinge":
             self.range = np.deg2rad(parse_vec(node.attrib.get("range", "-360 360")))
-        actu_node = (
-            body.tree.getroot().find("actuator").find(f'motor[@joint="{self.name}"]')
-        )
+        actu_node = (body.tree.getroot().find("actuator").find(f'motor[@joint="{self.name}"]'))
         if actu_node is not None:
             self.actuator = Actuator(actu_node, self)
         else:
@@ -178,27 +172,11 @@ class Joint:
         if self.local_coord:
             self.pos += body.pos
 
-        self.damping = (
-            parse_vec(node.attrib["damping"])
-            if "damping" in node.attrib
-            else np.array([0])
-        )
-        self.stiffness = (
-            parse_vec(node.attrib["stiffness"])
-            if "stiffness" in node.attrib
-            else np.array([0])
-        )
-        self.armature = (
-            parse_vec(node.attrib["armature"])
-            if "armature" in node.attrib
-            else np.array([0.01])
-        )
+        self.damping = (parse_vec(node.attrib["damping"]) if "damping" in node.attrib else np.array([0]))
+        self.stiffness = (parse_vec(node.attrib["stiffness"]) if "stiffness" in node.attrib else np.array([0]))
+        self.armature = (parse_vec(node.attrib["armature"]) if "armature" in node.attrib else np.array([0.01]))
 
-        self.frictionloss = (
-            parse_vec(node.attrib["frictionloss"])
-            if "frictionloss" in node.attrib
-            else np.array([0])
-        )
+        self.frictionloss = (parse_vec(node.attrib["frictionloss"]) if "frictionloss" in node.attrib else np.array([0]))
 
         assert np.all(self.pos == body.pos)
 
@@ -218,31 +196,19 @@ class Joint:
         if rename:
             self.name = self.body.name + "_joint_" + str(index)
         self.node.attrib["name"] = self.name
-        self.node.attrib["pos"] = " ".join(
-            [f"{x:.6f}".rstrip("0").rstrip(".") for x in pos]
-        )
+        self.node.attrib["pos"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in pos])
         if self.type == "hinge":
             axis_vec = polar_to_vec(self.axis)
-            self.node.attrib["axis"] = " ".join(
-                [f"{x:.6f}".rstrip("0").rstrip(".") for x in axis_vec]
-            )
+            self.node.attrib["axis"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in axis_vec])
         if self.actuator is not None:
             self.actuator.sync_node()
 
-        self.node.attrib["damping"] = " ".join(
-            [f"{x:.6f}".rstrip("0").rstrip(".") for x in self.damping]
-        )
-        self.node.attrib["stiffness"] = " ".join(
-            [f"{x:.6f}".rstrip("0").rstrip(".") for x in self.stiffness]
-        )
-        self.node.attrib["armature"] = " ".join(
-            [f"{x:.6f}".rstrip("0").rstrip(".") for x in self.armature]
-        )
+        self.node.attrib["damping"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in self.damping])
+        self.node.attrib["stiffness"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in self.stiffness])
+        self.node.attrib["armature"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in self.armature])
 
         if self.name != "Pelvis":
-            self.node.attrib["frictionloss"] = " ".join(
-                [f"{x:.6f}".rstrip("0").rstrip(".") for x in self.frictionloss]
-            )
+            self.node.attrib["frictionloss"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in self.frictionloss])
 
         # if np.sum([self.name.startswith(i) for i in ["L_Knee", "R_Knee", "L_Ankle", "R_Ankle", "L_Toe", "R_Toe"]]):
         # self.node.attrib["frictionloss"] = "500"
@@ -269,17 +235,13 @@ class Joint:
         if self.actuator is not None:
             self.actuator.get_params(param_list, get_name)
         elif pad_zeros:
-            param_list.append(
-                np.zeros(3 if self.type == "free" else 1)
-            )  # ZL currently a workaround for supporting 3D joints
+            param_list.append(np.zeros(3 if self.type == "free" else 1))  # ZL currently a workaround for supporting 3D joints
 
         if "damping" in self.param_specs:
             if get_name:
                 param_list.append("damping")
             else:
-                if not self.param_inited and self.param_specs["damping"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["damping"].get("rel", False):
                     self.param_specs["damping"]["lb"] += self.damping
                     self.param_specs["damping"]["ub"] += self.damping
                     self.param_specs["damping"]["lb"] = max(
@@ -301,9 +263,7 @@ class Joint:
             if get_name:
                 param_list.append("armature")
             else:
-                if not self.param_inited and self.param_specs["armature"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["armature"].get("rel", False):
                     self.param_specs["armature"]["lb"] += self.armature
                     self.param_specs["armature"]["ub"] += self.armature
                     self.param_specs["armature"]["lb"] = max(
@@ -326,9 +286,7 @@ class Joint:
             if get_name:
                 param_list.append("stiffness")
             else:
-                if not self.param_inited and self.param_specs["stiffness"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["stiffness"].get("rel", False):
                     self.param_specs["stiffness"]["lb"] += self.stiffness
                     self.param_specs["stiffness"]["ub"] += self.stiffness
                     self.param_specs["stiffness"]["lb"] = max(
@@ -349,9 +307,7 @@ class Joint:
             if get_name:
                 param_list.append("frictionloss")
             else:
-                if not self.param_inited and self.param_specs["frictionloss"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["frictionloss"].get("rel", False):
                     self.param_specs["frictionloss"]["lb"] += self.frictionloss
                     self.param_specs["frictionloss"]["ub"] += self.frictionloss
                     self.param_specs["frictionloss"]["lb"] = max(
@@ -376,9 +332,7 @@ class Joint:
     def set_params(self, params, pad_zeros=False):
         if "axis" in self.param_specs:
             if self.type == "hinge":
-                self.axis = denormalize_range(
-                    params[:2], np.array([0, -2 * np.pi]), np.array([np.pi, 2 * np.pi])
-                )
+                self.axis = denormalize_range(params[:2], np.array([0, -2 * np.pi]), np.array([np.pi, 2 * np.pi]))
                 params = params[2:]
             elif pad_zeros:
                 params = params[2:]
@@ -426,6 +380,7 @@ class Joint:
 
 
 class Geom:
+
     def __init__(self, node, body):
         self.node = node
         self.body = body
@@ -433,22 +388,14 @@ class Geom:
         self.local_coord = body.local_coord
         self.name = node.attrib.get("name", "")
         self.type = node.attrib["type"]
-        self.density = (
-            parse_vec(node.attrib["density"]) / 1000
-            if "density" in node.attrib
-            else np.array([1])
-        )
+        self.density = (parse_vec(node.attrib["density"]) / 1000 if "density" in node.attrib else np.array([1]))
         self.parse_param_specs()
         self.param_inited = False
         # tunable parameters
         # self.size = (
         #     parse_vec(node.attrib["size"]) if "size" in node.attrib else np.array([0])
         # )
-        self.size = (
-            parse_vec(node.attrib["size"])
-            if "size" in node.attrib
-            else np.array([1, 1, 1])
-        )
+        self.size = (parse_vec(node.attrib["size"]) if "size" in node.attrib else np.array([1, 1, 1]))
         if self.type == "box":
             self.start = self.end = self.pos = parse_vec(node.attrib["pos"])
             self.pos_delta = np.array([0, 0, 0])
@@ -470,9 +417,7 @@ class Geom:
         else:
             self.bone_start = body.bone_start.copy()
 
-        self.ext_start = np.linalg.norm(
-            self.bone_start - self.start
-        )  ## Geom extension from bone start
+        self.ext_start = np.linalg.norm(self.bone_start - self.start)  ## Geom extension from bone start
 
     def __repr__(self):
         return "geom_" + self.name
@@ -500,41 +445,23 @@ class Geom:
         # self.node.attrib['name'] = self.name
         self.node.attrib.pop("name", None)
         if not self.size is None:
-            self.node.attrib["size"] = " ".join(
-                [f"{x:.6f}".rstrip("0").rstrip(".") for x in self.size]
-            )
-        self.node.attrib["density"] = " ".join(
-            [f"{x * 1000:.6f}".rstrip("0").rstrip(".") for x in self.density]
-        )
+            self.node.attrib["size"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in self.size])
+        self.node.attrib["density"] = " ".join([f"{x * 1000:.6f}".rstrip("0").rstrip(".") for x in self.density])
 
         if self.type == "capsule":
             start = self.start - self.body.pos if self.local_coord else self.start
             end = self.end - self.body.pos if self.local_coord else self.end
-            self.node.attrib["fromto"] = " ".join(
-                [
-                    f"{x:.6f}".rstrip("0").rstrip(".")
-                    for x in np.concatenate([start, end])
-                ]
-            )
+            self.node.attrib["fromto"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in np.concatenate([start, end])])
         elif self.type == "box" or self.type == "sphere":
-            self.node.attrib["pos"] = " ".join(
-                [f"{x:.6f}".rstrip("0").rstrip(".") for x in self.pos + self.pos_delta]
-            )
+            self.node.attrib["pos"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in self.pos + self.pos_delta])
 
     def get_params(self, param_list, get_name=False, pad_zeros=False):
         if "size" in self.param_specs:
             if get_name:
                 param_list.append("size")
             else:
-                if (
-                    self.type == "capsule"
-                    or self.type == "box"
-                    or self.type == "sphere"
-                    or self.type == "mesh"
-                ):
-                    if not self.param_inited and self.param_specs["size"].get(
-                        "rel", False
-                    ):
+                if (self.type == "capsule" or self.type == "box" or self.type == "sphere" or self.type == "mesh"):
+                    if not self.param_inited and self.param_specs["size"].get("rel", False):
                         self.param_specs["size"]["lb"] += self.size
                         self.param_specs["size"]["ub"] += self.size
                         self.param_specs["size"]["lb"] = max(
@@ -552,9 +479,7 @@ class Geom:
                     )
                     param_list.append(size.flatten())
                     if pad_zeros and self.type == "capsule":
-                        param_list.append(
-                            np.zeros(2)
-                        )  # capsule has needs to be 3 for GNN
+                        param_list.append(np.zeros(2))  # capsule has needs to be 3 for GNN
 
                 elif pad_zeros:
                     param_list.append(np.zeros(self.size.shape))
@@ -563,14 +488,8 @@ class Geom:
             if get_name:
                 param_list.append("ext_start")
             else:
-                if (
-                    self.type == "capsule"
-                    or self.type == "box"
-                    or self.type == "sphere"
-                ):
-                    if not self.param_inited and self.param_specs["ext_start"].get(
-                        "rel", False
-                    ):
+                if (self.type == "capsule" or self.type == "box" or self.type == "sphere"):
+                    if not self.param_inited and self.param_specs["ext_start"].get("rel", False):
                         self.param_specs["ext_start"]["lb"] += self.ext_start
                         self.param_specs["ext_start"]["ub"] += self.ext_start
                         self.param_specs["ext_start"]["lb"] = max(
@@ -594,9 +513,7 @@ class Geom:
             if get_name:
                 param_list.append("density")
             else:
-                if not self.param_inited and self.param_specs["density"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["density"].get("rel", False):
                     self.param_specs["density"]["lb"] += self.density
                     self.param_specs["density"]["ub"] += self.density
                     self.param_specs["density"]["lb"] = max(
@@ -623,9 +540,7 @@ class Geom:
                 param_list.append("pos_delta")
             else:
                 if self.type == "box" or self.type == "sphere":
-                    if not self.param_inited and self.param_specs["pos_delta"].get(
-                        "rel", False
-                    ):
+                    if not self.param_inited and self.param_specs["pos_delta"].get("rel", False):
                         self.param_specs["pos_delta"]["lb"] += self.density
                         self.param_specs["pos_delta"]["ub"] += self.density
                         self.param_specs["pos_delta"]["lb"] = max(
@@ -651,12 +566,7 @@ class Geom:
 
     def set_params(self, params, pad_zeros=False):
         if "size" in self.param_specs:
-            if (
-                self.type == "capsule"
-                or self.type == "box"
-                or self.type == "sphere"
-                or self.type == "mesh"
-            ):
+            if (self.type == "capsule" or self.type == "box" or self.type == "sphere" or self.type == "mesh"):
                 if len(self.size) == 1:
                     self.size = denormalize_range(
                         params[[0]],
@@ -686,12 +596,7 @@ class Geom:
                 params = params[1:]
 
         if "density" in self.param_specs:
-            if (
-                self.type == "capsule"
-                or self.type == "box"
-                or self.type == "sphere"
-                or self.type == "mesh"
-            ):
+            if (self.type == "capsule" or self.type == "box" or self.type == "sphere" or self.type == "mesh"):
                 self.density = denormalize_range(
                     params[[0]],
                     self.param_specs["density"]["lb"],
@@ -716,6 +621,7 @@ class Geom:
 
 
 class Actuator:
+
     def __init__(self, node, joint):
         self.node = node
         self.joint = joint
@@ -779,6 +685,7 @@ class Actuator:
 
 
 class Body:
+
     def __init__(self, node, parent_body, robot, cfg, new_body=False):
         self.node = node
         self.parent = parent_body
@@ -793,11 +700,7 @@ class Body:
         self.cfg = cfg
         self.tree = robot.tree
         self.local_coord = robot.local_coord
-        self.name = (
-            node.attrib["name"]
-            if "name" in node.attrib
-            else self.parent.name + f"_child{len(self.parent.child)}"
-        )
+        self.name = (node.attrib["name"] if "name" in node.attrib else self.parent.name + f"_child{len(self.parent.child)}")
         self.child = []
         self.cind = 0
         self.pos = parse_vec(node.attrib["pos"])
@@ -808,16 +711,10 @@ class Body:
             self.bone_start = None if parent_body is None else self.pos.copy()
         else:
             self.bone_start = self.pos.copy()
-        self.joints = [Joint(x, self) for x in node.findall('joint[@type="hinge"]')] + [
-            Joint(x, self) for x in node.findall('joint[@type="free"]')
-        ]
+        self.joints = [Joint(x, self) for x in node.findall('joint[@type="hinge"]')] + [Joint(x, self) for x in node.findall('joint[@type="free"]')]
         # self.geoms = [Geom(x, self) for x in node.findall('geom[@type="capsule"]')]
         supported_geoms = self.cfg.get("supported_geoms", ["capsule", "box"])
-        self.geoms = [
-            Geom(x, self)
-            for geom_type in supported_geoms
-            for x in node.findall(f'geom[@type="{geom_type}"]')
-        ]
+        self.geoms = [Geom(x, self) for geom_type in supported_geoms for x in node.findall(f'geom[@type="{geom_type}"]')]
         # self.geoms = [Geom(x, self) for x in node.findall('geom[@type="capsule"]')] + [Geom(x, self) for x in node.findall('geom[@type="sphere"]')] +  [Geom(x, self) for x in node.findall('geom[@type="box"]')]
         self.parse_param_specs()
         self.param_inited = False
@@ -868,15 +765,9 @@ class Body:
         return self.joints[0].range
 
     def sync_node(self):
-        pos = (
-            self.pos - self.parent.pos
-            if self.local_coord and self.parent is not None
-            else self.pos
-        )
+        pos = (self.pos - self.parent.pos if self.local_coord and self.parent is not None else self.pos)
         self.node.attrib["name"] = self.name
-        self.node.attrib["pos"] = " ".join(
-            [f"{x:.6f}".rstrip("0").rstrip(".") for x in pos]
-        )
+        self.node.attrib["pos"] = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in pos])
         for idx, joint in enumerate(self.joints):
             joint.sync_node(rename=self.new_body, index=idx)
         for geom in self.geoms:
@@ -904,9 +795,7 @@ class Body:
         self.sync_geom()
         self.sync_joint()
 
-    def get_params(
-        self, param_list, get_name=False, pad_zeros=False, demap_params=False
-    ):
+    def get_params(self, param_list, get_name=False, pad_zeros=False, demap_params=False):
         if self.bone_offset is not None and "offset" in self.param_specs:
             if get_name:
                 if self.param_specs["offset"]["type"] == "xz":
@@ -922,22 +811,16 @@ class Body:
                     offset = self.bone_offset[[0, 1]]
                 else:
                     offset = self.bone_offset
-                if not self.param_inited and self.param_specs["offset"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["offset"].get("rel", False):
                     self.param_specs["offset"]["lb"] += offset
                     self.param_specs["offset"]["ub"] += offset
                     self.param_specs["offset"]["lb"] = np.maximum(
                         self.param_specs["offset"]["lb"],
-                        self.param_specs["offset"].get(
-                            "min", np.full_like(offset, -np.inf)
-                        ),
+                        self.param_specs["offset"].get("min", np.full_like(offset, -np.inf)),
                     )
                     self.param_specs["offset"]["ub"] = np.minimum(
                         self.param_specs["offset"]["ub"],
-                        self.param_specs["offset"].get(
-                            "max", np.full_like(offset, np.inf)
-                        ),
+                        self.param_specs["offset"].get("max", np.full_like(offset, np.inf)),
                     )
                 offset = normalize_range(
                     offset,
@@ -951,9 +834,7 @@ class Body:
                 param_list += ["bone_len"]
             else:
                 bone_len = np.linalg.norm(self.bone_offset)
-                if not self.param_inited and self.param_specs["bone_len"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["bone_len"].get("rel", False):
                     self.param_specs["bone_len"]["lb"] += bone_len
                     self.param_specs["bone_len"]["ub"] += bone_len
                     self.param_specs["bone_len"]["lb"] = max(
@@ -976,9 +857,7 @@ class Body:
                 param_list += ["bone_ang"]
             else:
                 bone_ang = math.atan2(self.bone_offset[2], self.bone_offset[0])
-                if not self.param_inited and self.param_specs["bone_ang"].get(
-                    "rel", False
-                ):
+                if not self.param_inited and self.param_specs["bone_ang"].get("rel", False):
                     self.param_specs["bone_ang"]["lb"] += bone_ang
                     self.param_specs["bone_ang"]["ub"] += bone_ang
                     self.param_specs["bone_ang"]["lb"] = max(
@@ -1059,9 +938,7 @@ class Body:
             bone_ang = math.atan2(self.bone_offset[2], self.bone_offset[0])
 
         if "bone_len" in self.param_specs or "bone_ang" in self.param_specs:
-            self.bone_offset = np.array(
-                [bone_len * math.cos(bone_ang), 0, bone_len * math.sin(bone_ang)]
-            )
+            self.bone_offset = np.array([bone_len * math.cos(bone_ang), 0, bone_len * math.sin(bone_ang)])
 
         for joint in self.joints:
             params = joint.set_params(params, pad_zeros)
@@ -1073,6 +950,7 @@ class Body:
 
 
 class Robot:
+
     def __init__(self, cfg, data_dir="data/smpl", masterfoot=False):
         self.bodies = []
         self.weight = 0
@@ -1084,18 +962,12 @@ class Robot:
         self.mesh = cfg.get("mesh", False)
         self.gender = cfg.get("gender", "neutral")
         self.flatfoot = cfg.get("flatfoot", True)
-        self.rel_joint_lm = cfg.get(
-            "rel_joint_lm", True
-        )  # Rolling this out worldwide!!
+        self.rel_joint_lm = cfg.get("rel_joint_lm", True)  # Rolling this out worldwide!!
 
         self.masterfoot = masterfoot
         self.param_specs = self.cfg.get("body_params", {})
         self.hull_dict = {}
-        self.beta = (
-            torch.zeros((1, 10)).float()
-            if self.smpl_model == "smpl"
-            else torch.zeros((1, 16)).float()
-        )
+        self.beta = (torch.zeros((1, 10)).float() if self.smpl_model == "smpl" else torch.zeros((1, 16)).float())
 
         if self.smpl_model == "smpl":
             self.smpl_parser_n = SMPL_Parser(model_path=data_dir, gender="neutral")
@@ -1108,12 +980,8 @@ class Robot:
                 use_pca=False,
                 create_transl=False,
             )
-            self.smpl_parser_m = SMPLH_Parser(
-                model_path=data_dir, gender="male", use_pca=False, create_transl=False
-            )
-            self.smpl_parser_f = SMPLH_Parser(
-                model_path=data_dir, gender="female", use_pca=False, create_transl=False
-            )
+            self.smpl_parser_m = SMPLH_Parser(model_path=data_dir, gender="male", use_pca=False, create_transl=False)
+            self.smpl_parser_f = SMPLH_Parser(model_path=data_dir, gender="female", use_pca=False, create_transl=False)
         elif self.smpl_model == "smplx":
             self.smpl_parser_n = SMPLX_Parser(
                 model_path=data_dir,
@@ -1121,12 +989,8 @@ class Robot:
                 use_pca=False,
                 create_transl=False,
             )
-            self.smpl_parser_m = SMPLX_Parser(
-                model_path=data_dir, gender="male", use_pca=False, create_transl=False
-            )
-            self.smpl_parser_f = SMPLX_Parser(
-                model_path=data_dir, gender="female", use_pca=False, create_transl=False
-            )
+            self.smpl_parser_m = SMPLX_Parser(model_path=data_dir, gender="male", use_pca=False, create_transl=False)
+            self.smpl_parser_f = SMPLX_Parser(model_path=data_dir, gender="female", use_pca=False, create_transl=False)
 
         self.load_from_skeleton()
 
@@ -1148,9 +1012,7 @@ class Robot:
         else:
             print(gender)
             raise Exception("Gender Not Supported!!")
-        vertices, joints = smpl_parser.get_joints_verts(
-            pose=pose_aa, th_betas=th_betas, th_trans=th_trans
-        )
+        vertices, joints = smpl_parser.get_joints_verts(pose=pose_aa, th_betas=th_betas, th_trans=th_trans)
         return vertices, joints
 
     def load_from_skeleton(
@@ -1176,26 +1038,18 @@ class Robot:
             raise Exception("Gender Not Supported!!")
 
         if betas is None and self.beta is None:
-            betas = (
-                torch.zeros((1, 10)).float()
-                if self.smpl_model == "smpl"
-                else torch.zeros((1, 16)).float()
-            )
+            betas = (torch.zeros((1, 10)).float() if self.smpl_model == "smpl" else torch.zeros((1, 16)).float())
         else:
             if params is None:
                 self.beta = betas if not betas is None else self.beta
             else:
                 # If params is not none, we need to set the beta first
                 betas = self.map_params(betas)
-                self.beta = torch.from_numpy(
-                    denormalize_range(
-                        betas.numpy().squeeze(),
-                        self.param_specs["beta"]["lb"],
-                        self.param_specs["beta"]["ub"],
-                    )[
-                        None,
-                    ]
-                )
+                self.beta = torch.from_numpy(denormalize_range(
+                    betas.numpy().squeeze(),
+                    self.param_specs["beta"]["lb"],
+                    self.param_specs["beta"]["ub"],
+                )[None,])
         if flags.debug:
             print(self.beta)
 
@@ -1228,13 +1082,7 @@ class Robot:
                 joint_range,
                 contype,
                 conaffinity,
-            ) = (
-                smpl_parser.get_mesh_offsets(betas=self.beta, flatfoot=self.flatfoot)
-                if self.smpl_model != "smplx"
-                else smpl_parser.get_mesh_offsets(v_template=v_template)
-            )
-
-
+            ) = (smpl_parser.get_mesh_offsets(betas=self.beta, flatfoot=self.flatfoot) if self.smpl_model != "smplx" else smpl_parser.get_mesh_offsets(v_template=v_template))
 
             if self.rel_joint_lm:
                 joint_range["L_Knee"][0] = np.array([-np.pi / 16, np.pi / 16])
@@ -1265,9 +1113,7 @@ class Robot:
 
             size_dict = {}
 
-            if (
-                len(self.get_params(get_name=True)) > 1 and not params is None
-            ):  # ZL: dank code, very dank code
+            if (len(self.get_params(get_name=True)) > 1 and not params is None):  # ZL: dank code, very dank code
                 self.set_params(params)
                 size_dict = self.get_size()
                 size_dict = self.enforce_length_size(size_dict)
@@ -1302,13 +1148,9 @@ class Robot:
             )
         else:
             self.skeleton = Skeleton()
-            offset_smpl_dict, parents_dict, channels = smpl_parser.get_offsets(
-                betas=self.beta
-            )
+            offset_smpl_dict, parents_dict, channels = smpl_parser.get_offsets(betas=self.beta)
 
-            self.skeleton.load_from_offsets(
-                offset_smpl_dict, parents_dict, 1, {}, channels, {}
-            )
+            self.skeleton.load_from_offsets(offset_smpl_dict, parents_dict, 1, {}, channels, {})
         self.bodies = []  ### Cleaning bodies list
         self.bone_length = np.array([np.linalg.norm(i) for i in joint_offsets.values()])
         parser = XMLParser(remove_blank_text=True)
@@ -1318,14 +1160,11 @@ class Robot:
                 # self.skeleton.write_str(
                 #     bump_buffer=self.smpl_model == "smplh" or self.smpl_model == "smplx"
                 # )
-                self.skeleton.write_str(bump_buffer=True)
-            ),
+                self.skeleton.write_str(bump_buffer=True)),
             parser=parser,
         )
 
-        self.local_coord = (
-            self.tree.getroot().find(".//compiler").attrib["coordinate"] == "local"
-        )
+        self.local_coord = (self.tree.getroot().find(".//compiler").attrib["coordinate"] == "local")
         root = self.tree.getroot().find("worldbody").find("body")
         self.add_body(root, None)
         self.init_bodies()
@@ -1335,20 +1174,34 @@ class Robot:
         if self.masterfoot:
             self.add_masterfoot()
 
-
         all_root = self.tree.getroot()
         contact_node = Element("contact", {})
-        
-        SubElement(contact_node,"exclude",{"name": "add01", "body1": "L_Shoulder", "body2": "Chest"},)
-        SubElement(contact_node,"exclude",{"name": "add02", "body1": "R_Shoulder", "body2": "Chest"},)
+
+        SubElement(
+            contact_node,
+            "exclude",
+            {
+                "name": "add01",
+                "body1": "L_Shoulder",
+                "body2": "Chest"
+            },
+        )
+        SubElement(
+            contact_node,
+            "exclude",
+            {
+                "name": "add02",
+                "body1": "R_Shoulder",
+                "body2": "Chest"
+            },
+        )
         all_root.append(contact_node)
 
         if not objs_info is None:
             temp_model = load_model_from_xml(self.export_xml_string().decode("utf-8"))
-            self.weight = mujoco_py.functions.mj_getTotalmass(
-                temp_model
-            )  # have to load the robot weight to save time
-
+            self.weight = mujoco_py.functions.mj_getTotalmass(temp_model)  # have to load the robot weight to save time
+            import ipdb
+            ipdb.set_trace()
             for obj_info in objs_info:
                 obj_name = obj_info.split("/")[-1].split(".")[0]
                 worldroot = self.tree.getroot().find("worldbody")
@@ -1356,7 +1209,11 @@ class Robot:
                 SubElement(
                     obj_node,
                     "joint",
-                    {"limited": "false", "name": obj_name, "type": "free"},
+                    {
+                        "limited": "false",
+                        "name": obj_name,
+                        "type": "free"
+                    },
                 )
                 SubElement(
                     obj_node,
@@ -1370,9 +1227,7 @@ class Robot:
                     },
                 )
                 if obj_name == "table":
-                    tb_pos = obj_pose[
-                        0, (len(objs_info) - 1) * 7 : (len(objs_info) - 1) * 7 + 3
-                    ]
+                    tb_pos = obj_pose[0, (len(objs_info) - 1) * 7:(len(objs_info) - 1) * 7 + 3]
                     SubElement(
                         obj_node,
                         "geom",
@@ -1391,19 +1246,16 @@ class Robot:
                 worldroot.append(obj_node)
 
                 asset = self.tree.getroot().find("asset")
-                asset.append(
-                    Element(
-                        "mesh",
-                        {
-                            "file": f"/hdd/zen/data/ActBound/GRAB/tools/object_meshes/contact_meshes_stl/{obj_name}.stl",
-                        },
-                    )
-                )
+                asset.append(Element(
+                    "mesh",
+                    {
+                        "file": f"/hdd/zen/data/ActBound/GRAB/tools/object_meshes/contact_meshes_stl/{obj_name}.stl",
+                    },
+                ))
 
-       
         if not params is None:
             self.set_params(params)
- 
+
     def in_body(self, body, point):
         return in_hull(self.hull_dict[body]["norm_hull"], point)
 
@@ -1432,31 +1284,31 @@ class Robot:
 
     def enforce_length_size(self, size_dict):
         distal_dir = {
-                "Pelvis": 1,
-                "L_Hip": 1,
-                "L_Knee": 1,
-                "L_Ankle": [1, 2],
-                "L_Toe": [1, 2],
-                "R_Hip": 1,
-                "R_Knee": 1,
-                "R_Ankle": [1, 2],
-                "R_Toe": [1, 2],
-                "Torso": 1,
-                "Spine": 1,
-                "Chest": 1,
-                "Neck": 1,
-                "Head": 1,
-                "L_Thorax": 0,
-                "L_Shoulder": 0,
-                "L_Elbow": 0,
-                "L_Wrist": 0,
-                "L_Hand": 0,
-                "R_Thorax": 0,
-                "R_Shoulder": 0,
-                "R_Elbow": 0,
-                "R_Wrist": 0,
-                "R_Hand": 0,
-            }
+            "Pelvis": 1,
+            "L_Hip": 1,
+            "L_Knee": 1,
+            "L_Ankle": [1, 2],
+            "L_Toe": [1, 2],
+            "R_Hip": 1,
+            "R_Knee": 1,
+            "R_Ankle": [1, 2],
+            "R_Toe": [1, 2],
+            "Torso": 1,
+            "Spine": 1,
+            "Chest": 1,
+            "Neck": 1,
+            "Head": 1,
+            "L_Thorax": 0,
+            "L_Shoulder": 0,
+            "L_Elbow": 0,
+            "L_Wrist": 0,
+            "L_Hand": 0,
+            "R_Thorax": 0,
+            "R_Shoulder": 0,
+            "R_Elbow": 0,
+            "R_Wrist": 0,
+            "R_Hand": 0,
+        }
         for k, v in size_dict.items():
             subset = np.array(v[distal_dir[k]])
             subset[subset <= 1] = 1
@@ -1486,26 +1338,22 @@ class Robot:
         body_index = [3, 7]
         for idx in body_index:
             body2clone = body = self.bodies[idx]
-            diff_mul = (
-                np.linalg.norm(body.pos - body.child[0].pos) / 0.13432456960660616
-            )
+            diff_mul = (np.linalg.norm(body.pos - body.child[0].pos) / 0.13432456960660616)
 
-            template_pos = np.array(
-                [
-                    [0, -0.15, 0],
-                    [-0.08, -0.15, 0.1],
-                    [0.08, -0.15, 0.1],
-                    [-0.1, -0.15, 0.2],
-                    [0.1, -0.15, 0.2],
-                    [-0.1, -0.15, 0.35],
-                    [0.1, -0.15, 0.35],
-                    [-0.1, -0.17, 0.6],
-                    [0.1, -0.17, 0.6],
-                    [0, -0.17, 0.6],
-                    [0.05, -0.17, 0.6],
-                    [-0.05, -0.17, 0.6],
-                ]
-            )
+            template_pos = np.array([
+                [0, -0.15, 0],
+                [-0.08, -0.15, 0.1],
+                [0.08, -0.15, 0.1],
+                [-0.1, -0.15, 0.2],
+                [0.1, -0.15, 0.2],
+                [-0.1, -0.15, 0.35],
+                [0.1, -0.15, 0.35],
+                [-0.1, -0.17, 0.6],
+                [0.1, -0.17, 0.6],
+                [0, -0.17, 0.6],
+                [0.05, -0.17, 0.6],
+                [-0.05, -0.17, 0.6],
+            ])
 
             template_pos[:, 2] -= 0.08 * diff_mul
             template_pos[:, 0] -= 0.05 * diff_mul if idx == 7 else -0.05 * diff_mul
@@ -1523,34 +1371,15 @@ class Robot:
                     while len(last_child.child) > 0:
                         last_child = last_child.child[-1]
 
-                    actu_insert_index = (
-                        actu_node.index(
-                            actu_node.find(
-                                f'motor[@joint="{last_child.joints[-1].name}"]'
-                            )
-                        )
-                        + 1
-                    )
+                    actu_insert_index = (actu_node.index(actu_node.find(f'motor[@joint="{last_child.joints[-1].name}"]')) + 1)
                 else:
-                    actu_insert_index = (
-                        actu_node.index(
-                            actu_node.find(f'motor[@joint="{body.joints[-1].name}"]')
-                        )
-                        + 1
-                    )
+                    actu_insert_index = (actu_node.index(actu_node.find(f'motor[@joint="{body.joints[-1].name}"]')) + 1)
 
                 for bnode in child_node.findall("body"):
                     child_node.remove(bnode)
-                child_body = Body(
-                    child_node, body, self, self.cfg, new_body=True
-                )  # This needs to called after finding the actu_insert_index
+                child_body = Body(child_node, body, self, self.cfg, new_body=True)  # This needs to called after finding the actu_insert_index
                 pose_delta = np.array(template_pos[i])
-                start = " ".join(
-                    [
-                        f"{x:.6f}".rstrip("0").rstrip(".")
-                        for x in np.array([pose_delta[0], pose_delta[1], pose_delta[2]])
-                    ]
-                )
+                start = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in np.array([pose_delta[0], pose_delta[1], pose_delta[2]])])
 
                 attributes = {
                     "size": "0.035",
@@ -1569,9 +1398,7 @@ class Robot:
                 geom_node = SubElement(child_node, "geom", attributes)
                 child_body.geoms = [Geom(geom_node, child_body)]
                 for joint in child_body.joints:
-                    new_actu_node = deepcopy(
-                        actu_node.find(f'motor[@joint="{joint.name}"]')
-                    )
+                    new_actu_node = deepcopy(actu_node.find(f'motor[@joint="{joint.name}"]'))
 
                     actu_node.insert(actu_insert_index, new_actu_node)
                     joint.actuator = Actuator(new_actu_node, joint)
@@ -1601,34 +1428,17 @@ class Robot:
             while len(last_child.child) > 0:
                 last_child = last_child.child[-1]
 
-            actu_insert_index = (
-                actu_node.index(
-                    actu_node.find(f'motor[@joint="{last_child.joints[-1].name}"]')
-                )
-                + 1
-            )
+            actu_insert_index = (actu_node.index(actu_node.find(f'motor[@joint="{last_child.joints[-1].name}"]')) + 1)
         else:
-            actu_insert_index = (
-                actu_node.index(
-                    actu_node.find(f'motor[@joint="{body.joints[-1].name}"]')
-                )
-                + 1
-            )
+            actu_insert_index = (actu_node.index(actu_node.find(f'motor[@joint="{body.joints[-1].name}"]')) + 1)
 
         for bnode in child_node.findall("body"):
             child_node.remove(bnode)
 
         ######## Special case for the the foot, template geom   ##############
-        child_body = Body(
-            child_node, body, self, self.cfg, new_body=True
-        )  # This needs to called after finding the actu_insert_index
+        child_body = Body(child_node, body, self, self.cfg, new_body=True)  # This needs to called after finding the actu_insert_index
 
-        start = " ".join(
-            [
-                f"{x:.6f}".rstrip("0").rstrip(".")
-                for x in body.pos + np.array([0.0, -0.05, 0.05])
-            ]
-        )
+        start = " ".join([f"{x:.6f}".rstrip("0").rstrip(".") for x in body.pos + np.array([0.0, -0.05, 0.05])])
 
         attributes = {
             "size": "0.020 0.1000 0.0100",
@@ -1736,21 +1546,23 @@ class Robot:
             geom_node = SubElement(
                 body_node,
                 "geom",
-                {"mesh": "cone", "type": "mesh", "rgba": "0.0 0.8 1.0 1.0"},
+                {
+                    "mesh": "cone",
+                    "type": "mesh",
+                    "rgba": "0.0 0.8 1.0 1.0"
+                },
             )
             worldbody.append(body_node)
         for i in range(num_cones):
-            worldbody.append(
-                Element(
-                    "geom",
-                    {
-                        "fromto": "0.0 0.0 0.0 0.0 1.0 0.0",
-                        "rgba": "0.0 0.8 1.0 1.0",
-                        "type": "cylinder",
-                        "size": "0.0420",
-                    },
-                )
-            )
+            worldbody.append(Element(
+                "geom",
+                {
+                    "fromto": "0.0 0.0 0.0 0.0 1.0 0.0",
+                    "rgba": "0.0 0.8 1.0 1.0",
+                    "type": "cylinder",
+                    "size": "0.0420",
+                },
+            ))
         if num_cones > 0:
             asset = tree.getroot().find("asset")
             SubElement(
@@ -1874,15 +1686,11 @@ class Robot:
         params = self.map_params(params)
 
         if "beta" in self.param_specs:
-            self.beta = torch.from_numpy(
-                denormalize_range(
-                    params[0:10],
-                    self.param_specs["beta"]["lb"],
-                    self.param_specs["beta"]["ub"],
-                )[
-                    None,
-                ]
-            )
+            self.beta = torch.from_numpy(denormalize_range(
+                params[0:10],
+                self.param_specs["beta"]["lb"],
+                self.param_specs["beta"]["ub"],
+            )[None,])
             params = params[10:]
 
         for body in self.bodies:
@@ -1912,7 +1720,6 @@ if __name__ == "__main__":
     # parser.add_argument("--cfg", default="copycat_ball_1")
     parser.add_argument("--cfg", default="copycat_40")
     args = parser.parse_args()
- 
 
     cfg = Config(cfg_id=args.cfg, create_dirs=False)
     cfg.robot_cfg["model"] = "smpl"
@@ -1922,9 +1729,8 @@ if __name__ == "__main__":
     # smpl_robot = Robot(cfg.robot_cfg, masterfoot=True)
     params_names = smpl_robot.get_params(get_name=True)
 
-     
     # from uhc.smpllib.smpl_mujoco import smpl_6d_to_qpose, smpl_to_qpose
-    # relive_mocap_grad = joblib.load("/hdd/zen/data/ActBound/AMASS/singles/amass_copycat_take5_singles_run.pkl")
+    # relive_mocap_grad = joblib.load("sample_data/singles/amass_copycat_take5_singles_run.pkl")
     # print(relive_mocap_grad.keys())
     # k = "0-ACCAD_Male2Running_c3d_C3 - run_poses"
     # full_pose = relive_mocap_grad[k]['pose_aa']
@@ -1932,7 +1738,7 @@ if __name__ == "__main__":
     # beta = relive_mocap_grad[k]['beta']
     # gender = relive_mocap_grad[k]['gender']
 
-    smpl_robot.load_from_skeleton( gender = [1])
+    smpl_robot.load_from_skeleton(gender=[1])
     smpl_robot.write_xml(f"test.xml")
     model = load_model_from_path(f"test.xml")
 

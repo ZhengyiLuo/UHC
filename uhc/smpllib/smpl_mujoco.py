@@ -34,6 +34,7 @@ from uhc.utils.transform_utils import (
 
 
 class SMPLConverter:
+
     def __init__(self, model, new_model, smpl_model="smpl"):
         if smpl_model == "smpl":
             self.body_ws = {
@@ -216,17 +217,9 @@ class SMPLConverter:
         new_qpos_addr = self.new_qpos_addr
         if len(qpos.shape) == 2:
             b_size = qpos.shape[0]
-            jt_array = [
-                qpos[:, smpl_qpos_addr[k][0]:smpl_qpos_addr[k][1]]
-                if k in smpl_qpos_addr else np.zeros((b_size, 3))
-                for k in new_qpos_addr.keys()
-            ]
+            jt_array = [qpos[:, smpl_qpos_addr[k][0]:smpl_qpos_addr[k][1]] if k in smpl_qpos_addr else np.zeros((b_size, 3)) for k in new_qpos_addr.keys()]
         else:
-            jt_array = [
-                qpos[smpl_qpos_addr[k][0]:smpl_qpos_addr[k][1]]
-                if k in smpl_qpos_addr else np.zeros((3))
-                for k in new_qpos_addr.keys()
-            ]
+            jt_array = [qpos[smpl_qpos_addr[k][0]:smpl_qpos_addr[k][1]] if k in smpl_qpos_addr else np.zeros((3)) for k in new_qpos_addr.keys()]
         return np.hstack(jt_array)
 
     def qvel_smpl_2_new(self, qpvel):
@@ -234,25 +227,14 @@ class SMPLConverter:
         new_qvel_addr = self.new_qvel_addr
         if len(qpvel.shape) == 2:
             b_size = qpvel.shape[0]
-            jt_array = [
-                qpvel[:, smpl_qvel_addr[k][0]:smpl_qvel_addr[k][1]]
-                if k in smpl_qvel_addr else np.zeros((b_size, 3))
-                for k in new_qvel_addr.keys()
-            ]
+            jt_array = [qpvel[:, smpl_qvel_addr[k][0]:smpl_qvel_addr[k][1]] if k in smpl_qvel_addr else np.zeros((b_size, 3)) for k in new_qvel_addr.keys()]
         else:
-            jt_array = [
-                qpvel[smpl_qvel_addr[k][0]:smpl_qvel_addr[k][1]]
-                if k in smpl_qvel_addr else np.zeros((3))
-                for k in new_qvel_addr.keys()
-            ]
+            jt_array = [qpvel[smpl_qvel_addr[k][0]:smpl_qvel_addr[k][1]] if k in smpl_qvel_addr else np.zeros((3)) for k in new_qvel_addr.keys()]
         return np.hstack(jt_array)
 
     def qpos_new_2_smpl(self, qpos):
         new_qpos_addr = self.new_qpos_addr
-        subset = np.concatenate([
-            np.arange(new_qpos_addr[jt][0], new_qpos_addr[jt][1])
-            for jt in self.smpl_joint_names
-        ])
+        subset = np.concatenate([np.arange(new_qpos_addr[jt][0], new_qpos_addr[jt][1]) for jt in self.smpl_joint_names])
         if len(qpos.shape) == 2:
             return qpos[:, subset]
         else:
@@ -260,10 +242,7 @@ class SMPLConverter:
 
     def qvel_new_2_smpl(self, qvel):
         new_qvel_addr = self.new_qvel_addr
-        subset = np.concatenate([
-            np.arange(new_qvel_addr[jt][0], new_qvel_addr[jt][1])
-            for jt in self.smpl_joint_names
-        ])
+        subset = np.concatenate([np.arange(new_qvel_addr[jt][0], new_qvel_addr[jt][1]) for jt in self.smpl_joint_names])
         if len(qvel.shape) == 2:
             return qvel[:, subset]
         else:
@@ -271,55 +250,39 @@ class SMPLConverter:
 
     def jpos_new_2_smpl(self, jpos):
         new_qpos_names = list(self.new_qpos_addr.keys())
-        subset = np.array(
-            [new_qpos_names.index(jt) for jt in self.smpl_joint_names])
-        if len(jpos.shape) == 1 or (len(jpos.shape) == 2
-                                    and jpos.shape[1] == 3):
+        subset = np.array([new_qpos_names.index(jt) for jt in self.smpl_joint_names])
+        if len(jpos.shape) == 1 or (len(jpos.shape) == 2 and jpos.shape[1] == 3):
             return jpos.reshape(-1, 3)[subset, :]
         elif (len(jpos.shape) == 2) or len(jpos.shape) == 3:
             return jpos.reshape(jpos.shape[0], -1, 3)[:, subset, :]
 
     def get_new_qpos_lim(self):
-        return np.max(
-            self.new_model.jnt_qposadr
-        ) + self.new_model.jnt_qposadr[-1] - self.new_model.jnt_qposadr[-2]
+        return np.max(self.new_model.jnt_qposadr) + self.new_model.jnt_qposadr[-1] - self.new_model.jnt_qposadr[-2]
 
     def get_new_qvel_lim(self):
-        return np.max(
-            self.new_model.jnt_dofadr
-        ) + self.new_model.jnt_dofadr[-1] - self.new_model.jnt_dofadr[-2]
+        return np.max(self.new_model.jnt_dofadr) + self.new_model.jnt_dofadr[-1] - self.new_model.jnt_dofadr[-2]
 
     def get_new_body_lim(self):
         return len(self.new_model.body_names)
 
     def get_new_diff_weight(self):
-        return np.array([
-            self.body_ws[n] if n in self.body_ws else 0
-            for n in self.new_joint_names
-        ])
+        return np.array([self.body_ws[n] if n in self.body_ws else 0 for n in self.new_joint_names])
 
     def get_new_jkp(self):
-        return np.concatenate([[self.body_params[n][0]] *
-                               3 if n in self.body_ws else [50] * 3
-                               for n in self.new_joint_names[1:]])
+        return np.concatenate([[self.body_params[n][0]] * 3 if n in self.body_ws else [50] * 3 for n in self.new_joint_names[1:]])
 
     def get_new_jkd(self):
-        return np.concatenate([[self.body_params[n][1]] *
-                               3 if n in self.body_ws else [5] * 3
-                               for n in self.new_joint_names[1:]])
+        return np.concatenate([[self.body_params[n][1]] * 3 if n in self.body_ws else [5] * 3 for n in self.new_joint_names[1:]])
 
     def get_new_a_scale(self):
-        return np.concatenate([[self.body_params[n][2]] *
-                               3 if n in self.body_ws else [1] * 3
-                               for n in self.new_joint_names[1:]])
+        return np.concatenate([[self.body_params[n][2]] * 3 if n in self.body_ws else [1] * 3 for n in self.new_joint_names[1:]])
 
     def get_new_torque_limit(self):
-        return np.concatenate([[self.body_params[n][3]] *
-                               3 if n in self.body_ws else [200] * 3
-                               for n in self.new_joint_names[1:]])
+        return np.concatenate([[self.body_params[n][3]] * 3 if n in self.body_ws else [200] * 3 for n in self.new_joint_names[1:]])
 
 
 class SMPL_M_Renderer(object):
+
     def __init__(
             self,
             model_file="assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
@@ -368,14 +331,14 @@ class SMPL_M_Renderer(object):
             )
 
     def render_qpose_and_write(
-        self,
-        qpos,
-        output_name=None,
-        size=(960, 480),
-        frame_rate=30,
-        add_text=None,
-        offset_z=0,
-        follow=False,
+            self,
+            qpos,
+            output_name=None,
+            size=(960, 480),
+            frame_rate=30,
+            add_text=None,
+            offset_z=0,
+            follow=False,
     ):
 
         images = self.render_qpose(
@@ -398,13 +361,13 @@ class SMPL_M_Renderer(object):
             )
 
     def render_qpose(
-        self,
-        qpose,
-        size=(960, 480),
-        frame_rate=30,
-        add_text=None,
-        offset_z=0,
-        follow=False,
+            self,
+            qpose,
+            size=(960, 480),
+            frame_rate=30,
+            add_text=None,
+            offset_z=0,
+            follow=False,
     ):
         images = []
         print("Rendering: ", qpose.shape)
@@ -418,8 +381,7 @@ class SMPL_M_Renderer(object):
                 self.viewer.cam.lookat[:2] = qpose[fr, :2]
             self.viewer.render(size[0], size[1])
             data = np.asarray(
-                self.viewer.read_pixels(size[0], size[1],
-                                        depth=False)[::-1, :, :],
+                self.viewer.read_pixels(size[0], size[1], depth=False)[::-1, :, :],
                 dtype=np.uint8,
             )
             images.append(cv2.cvtColor(data, cv2.COLOR_BGR2RGB))
@@ -431,8 +393,7 @@ class SMPL_M_Renderer(object):
 
         while True:
             if t >= math.floor(self.T) and not self.qpos_traj is None:
-                self.sim.data.qpos[:] = self.qpos_traj[fr %
-                                                       self.qpos_traj.shape[0]]
+                self.sim.data.qpos[:] = self.qpos_traj[fr % self.qpos_traj.shape[0]]
                 self.sim.data.qpos[2] += self.offset_z
                 # self.sim.forward()
                 fr += 1
@@ -442,8 +403,7 @@ class SMPL_M_Renderer(object):
             self.viewer.render(size[0], size[1])
             # data = np.asarray(self.viewer.read_pixels(size[0], size[1], depth=False)[::-1, :, :], dtype=np.uint8)
             t += 1
-            if (not loop and not self.qpos_traj is None
-                    and fr >= self.qpos_traj.shape[0]):
+            if (not loop and not self.qpos_traj is None and fr >= self.qpos_traj.shape[0]):
                 break
 
     def set_smpl_pose(self, pose, tran=None, offset_z=0):
@@ -468,6 +428,7 @@ class SMPL_M_Renderer(object):
 
 
 class SMPL_M_Viewer(object):
+
     def __init__(
             self,
             model_file="assets/mujoco_models/humanoid_smpl_neutral_mesh.xml",
@@ -515,8 +476,7 @@ class SMPL_M_Viewer(object):
         max_len = self.qpos_traj.shape[0]
         while loop or fr <= max_len:
             if t >= math.floor(self.T) and not self.qpos_traj is None:
-                self.sim.data.qpos[:] = self.qpos_traj[fr %
-                                                       self.qpos_traj.shape[0]]
+                self.sim.data.qpos[:] = self.qpos_traj[fr % self.qpos_traj.shape[0]]
                 self.sim.data.qpos[2] += self.offset_z
                 self.sim.forward()
                 fr += 1
@@ -525,8 +485,7 @@ class SMPL_M_Viewer(object):
             self.viewer.render()
             if return_img:
                 self.curr_img = np.asarray(
-                    self.viewer.read_pixels(size[0], size[1],
-                                            depth=False)[::-1, :, :],
+                    self.viewer.read_pixels(size[0], size[1], depth=False)[::-1, :, :],
                     dtype=np.uint8,
                 )
             t += 1
@@ -536,8 +495,7 @@ class SMPL_M_Viewer(object):
         t = 0
         while True:
             if t >= math.floor(self.T) and not self.qpos_traj is None:
-                self.sim.data.qpos[:] = self.qpos_traj[fr %
-                                                       self.qpos_traj.shape[0]]
+                self.sim.data.qpos[:] = self.qpos_traj[fr % self.qpos_traj.shape[0]]
                 self.sim.data.qpos[2] += self.offset_z
                 self.sim.forward()
                 fr += 1
@@ -546,16 +504,14 @@ class SMPL_M_Viewer(object):
             self.viewer.render()
             if return_img:
                 self.curr_img = np.asarray(
-                    self.viewer.read_pixels(size[0], size[1],
-                                            depth=False)[::-1, :, :],
+                    self.viewer.read_pixels(size[0], size[1], depth=False)[::-1, :, :],
                     dtype=np.uint8,
                 )
             t += 1
 
     def show_pose_thread(self, return_img=False):
         try:
-            t = threading.Thread(target=self.show_pose_in_thread,
-                                 args=(return_img, ))
+            t = threading.Thread(target=self.show_pose_in_thread, args=(return_img,))
             t.start()
         except e as E:
             print(E, "gg")
@@ -624,35 +580,25 @@ def smpl_to_qpose(
 
     num_joints = len(joint_names)
     num_angles = num_joints * 3
-    smpl_2_mujoco = [
-        joint_names.index(q) for q in list(get_body_qposaddr(mj_model).keys())
-        if q in joint_names
-    ]
+    smpl_2_mujoco = [joint_names.index(q) for q in list(get_body_qposaddr(mj_model).keys()) if q in joint_names]
 
     pose = pose.reshape(-1, num_angles)
 
-    curr_pose_mat = angle_axis_to_rotation_matrix(pose.reshape(-1, 3)).reshape(
-        pose.shape[0], -1, 4, 4)
+    curr_pose_mat = angle_axis_to_rotation_matrix(pose.reshape(-1, 3)).reshape(pose.shape[0], -1, 4, 4)
 
-    curr_spose = sRot.from_matrix(curr_pose_mat[:, :, :3, :3].reshape(
-        -1, 3, 3).numpy())
+    curr_spose = sRot.from_matrix(curr_pose_mat[:, :, :3, :3].reshape(-1, 3, 3).numpy())
     if use_quat:
-        curr_spose = curr_spose.as_quat()[:, [3, 0, 1, 2]].reshape(
-            curr_pose_mat.shape[0], -1)
+        curr_spose = curr_spose.as_quat()[:, [3, 0, 1, 2]].reshape(curr_pose_mat.shape[0], -1)
         num_angles = num_joints * (4 if use_quat else 3)
     else:
-        curr_spose = curr_spose.as_euler(euler_order, degrees=False).reshape(
-            curr_pose_mat.shape[0], -1)
+        curr_spose = curr_spose.as_euler(euler_order, degrees=False).reshape(curr_pose_mat.shape[0], -1)
 
-    curr_spose = curr_spose.reshape(
-        -1, num_joints,
-        4 if use_quat else 3)[:, smpl_2_mujoco, :].reshape(-1, num_angles)
+    curr_spose = curr_spose.reshape(-1, num_joints, 4 if use_quat else 3)[:, smpl_2_mujoco, :].reshape(-1, num_angles)
     if use_quat:
         curr_qpos = np.concatenate([trans, curr_spose], axis=1)
     else:
         root_quat = rotation_matrix_to_quaternion(curr_pose_mat[:, 0, :3, :])
-        curr_qpos = np.concatenate((trans, root_quat, curr_spose[:, 3:]),
-                                   axis=1)
+        curr_qpos = np.concatenate((trans, root_quat, curr_spose[:, 3:]), axis=1)
 
     if count_offset:
 
@@ -703,35 +649,26 @@ def smpl_to_qpose_multi(
 
     num_joints = len(joint_names)
     num_angles = num_joints * 3
-    smpl_2_mujoco = [
-        joint_names.index(q) for q in mujoco_body_order if q in joint_names
-    ]
+    smpl_2_mujoco = [joint_names.index(q) for q in mujoco_body_order if q in joint_names]
 
     pose = pose.reshape(-1, num_angles)
 
-    curr_pose_mat = angle_axis_to_rotation_matrix(pose.reshape(-1, 3)).reshape(
-        pose.shape[0], -1, 4, 4)
+    curr_pose_mat = angle_axis_to_rotation_matrix(pose.reshape(-1, 3)).reshape(pose.shape[0], -1, 4, 4)
 
-    curr_spose = sRot.from_matrix(curr_pose_mat[:, :, :3, :3].reshape(
-        -1, 3, 3).numpy())
+    curr_spose = sRot.from_matrix(curr_pose_mat[:, :, :3, :3].reshape(-1, 3, 3).numpy())
     if use_quat:
-        curr_spose = curr_spose.as_quat()[:, [3, 0, 1, 2]].reshape(
-            curr_pose_mat.shape[0], -1)
+        curr_spose = curr_spose.as_quat()[:, [3, 0, 1, 2]].reshape(curr_pose_mat.shape[0], -1)
         num_angles = num_joints * (4 if use_quat else 3)
     else:
-        curr_spose = curr_spose.as_euler(euler_order, degrees=False).reshape(
-            curr_pose_mat.shape[0], -1)
+        curr_spose = curr_spose.as_euler(euler_order, degrees=False).reshape(curr_pose_mat.shape[0], -1)
 
-    curr_spose = curr_spose.reshape(
-        -1, num_joints,
-        4 if use_quat else 3)[:, smpl_2_mujoco, :].reshape(-1, num_angles)
+    curr_spose = curr_spose.reshape(-1, num_joints, 4 if use_quat else 3)[:, smpl_2_mujoco, :].reshape(-1, num_angles)
     if use_quat:
         curr_qpos = np.concatenate([trans, curr_spose], axis=1)
     else:
 
         root_quat = rotation_matrix_to_quaternion(curr_pose_mat[:, 0, :3, :])
-        curr_qpos = np.concatenate((trans, root_quat, curr_spose[:, 3:]),
-                                   axis=1)
+        curr_qpos = np.concatenate((trans, root_quat, curr_spose[:, 3:]), axis=1)
 
     if count_offset:
         curr_qpos[:, :3] = trans + offset
@@ -780,28 +717,20 @@ def smpl_to_qpose_torch(
 
     num_joints = len(joint_names)
     num_angles = num_joints * 3
-    smpl_2_mujoco = [
-        joint_names.index(q) for q in list(get_body_qposaddr(mj_model).keys())
-        if q in joint_names
-    ]
+    smpl_2_mujoco = [joint_names.index(q) for q in list(get_body_qposaddr(mj_model).keys()) if q in joint_names]
 
     pose = pose.reshape(-1, num_angles)
 
-    curr_pose_mat = angle_axis_to_rotation_matrix(pose.reshape(-1, 3)).reshape(
-        pose.shape[0], -1, 4, 4)
+    curr_pose_mat = angle_axis_to_rotation_matrix(pose.reshape(-1, 3)).reshape(pose.shape[0], -1, 4, 4)
 
-    curr_spose = tR.matrix_to_euler_angles(curr_pose_mat[:, :, :3, :3],
-                                           convention=euler_order)
-    curr_spose = curr_spose.reshape(
-        -1, num_joints,
-        4 if use_quat else 3)[:, smpl_2_mujoco, :].reshape(-1, num_angles)
+    curr_spose = tR.matrix_to_euler_angles(curr_pose_mat[:, :, :3, :3], convention=euler_order)
+    curr_spose = curr_spose.reshape(-1, num_joints, 4 if use_quat else 3)[:, smpl_2_mujoco, :].reshape(-1, num_angles)
 
     root_quat = rotation_matrix_to_quaternion(curr_pose_mat[:, 0, :3, :])
     curr_qpos = torch.cat((trans, root_quat, curr_spose[:, 3:]), axis=1)
 
     if count_offset:
-        curr_qpos[:, :3] = trans + torch.from_numpy(
-            mj_model.body_pos[1]).to(root_quat)
+        curr_qpos[:, :3] = trans + torch.from_numpy(mj_model.body_pos[1]).to(root_quat)
 
     return curr_qpos
 
@@ -810,20 +739,15 @@ def qpos_to_smpl(qpos, mj_model, smpl_model="smpl"):
     body_qposaddr = get_body_qposaddr(mj_model)
     batch_size = qpos.shape[0]
     trans = qpos[:, :3] - mj_model.body_pos[1]
-    smpl_bones_to_use = (SMPL_BONE_ORDER_NAMES
-                         if smpl_model == "smpl" else SMPLH_BONE_ORDER_NAMES)
+    smpl_bones_to_use = (SMPL_BONE_ORDER_NAMES if smpl_model == "smpl" else SMPLH_BONE_ORDER_NAMES)
     pose = np.zeros([batch_size, len(smpl_bones_to_use), 3])
     for ind1, bone_name in enumerate(smpl_bones_to_use):
         ind2 = body_qposaddr[bone_name]
         if ind1 == 0:
             quat = qpos[:, 3:7]
-            pose[:, ind1, :] = sRot.from_quat(quat[:,
-                                                   [1, 2, 3, 0]]).as_rotvec()
+            pose[:, ind1, :] = sRot.from_quat(quat[:, [1, 2, 3, 0]]).as_rotvec()
         else:
-            pose[:,
-                 ind1, :] = sRot.from_euler("ZYX",
-                                            qpos[:,
-                                                 ind2[0]:ind2[1]]).as_rotvec()
+            pose[:, ind1, :] = sRot.from_euler("ZYX", qpos[:, ind2[0]:ind2[1]]).as_rotvec()
 
     return pose, trans
 
@@ -832,8 +756,7 @@ def qpos_to_smpl_torch(qpos, mj_model, smpl_model="smpl"):
     body_qposaddr = get_body_qposaddr(mj_model)
     batch_size = qpos.shape[0]
     trans = qpos[:, :3] - torch.from_numpy(mj_model.body_pos[1]).to(qpos)
-    smpl_bones_to_use = (SMPL_BONE_ORDER_NAMES
-                         if smpl_model == "smpl" else SMPLH_BONE_ORDER_NAMES)
+    smpl_bones_to_use = (SMPL_BONE_ORDER_NAMES if smpl_model == "smpl" else SMPLH_BONE_ORDER_NAMES)
 
     pose = torch.zeros([batch_size, len(smpl_bones_to_use), 3]).to(qpos)
 
@@ -843,13 +766,9 @@ def qpos_to_smpl_torch(qpos, mj_model, smpl_model="smpl"):
             quat = qpos[:, 3:7]
             import ipdb
             ipdb.set_trace()
-            pose[:, ind1, :] = sRot.from_quat(quat[:,
-                                                   [1, 2, 3, 0]]).as_rotvec()
+            pose[:, ind1, :] = sRot.from_quat(quat[:, [1, 2, 3, 0]]).as_rotvec()
         else:
-            pose[:,
-                 ind1, :] = sRot.from_euler("ZYX",
-                                            qpos[:,
-                                                 ind2[0]:ind2[1]]).as_rotvec()
+            pose[:, ind1, :] = sRot.from_euler("ZYX", qpos[:, ind2[0]:ind2[1]]).as_rotvec()
 
     return pose, trans
 
@@ -865,9 +784,7 @@ def normalize_smpl_pose(pose_aa, trans=None, random_root=False):
     root_aa = pose_aa[0, :3]
     root_rot = sRot.from_rotvec(np.array(root_aa))
     root_euler = np.array(root_rot.as_euler("xyz", degrees=False))
-    target_root_euler = (
-        root_euler.copy()
-    )  # take away Z axis rotation so the human is always facing same direction
+    target_root_euler = (root_euler.copy())  # take away Z axis rotation so the human is always facing same direction
     if random_root:
         target_root_euler[2] = np.random.random(1) * np.pi * 2
     else:
@@ -882,8 +799,7 @@ def normalize_smpl_pose(pose_aa, trans=None, random_root=False):
     if torch.is_tensor(pose_aa):
         pose_aa = vertizalize_smpl_root(pose_aa, root_vec=target_root_aa)
     else:
-        pose_aa = vertizalize_smpl_root(torch.from_numpy(pose_aa),
-                                        root_vec=target_root_aa)
+        pose_aa = vertizalize_smpl_root(torch.from_numpy(pose_aa), root_vec=target_root_aa)
 
     if not trans is None:
         trans[:, [0, 1]] -= trans[0, [0, 1]]

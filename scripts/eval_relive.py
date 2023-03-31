@@ -239,7 +239,7 @@ if __name__ == "__main__":
 
     """environment"""
     action = args.action
-    cfg.data_specs['test_file_path'] = "/hdd/zen/data/ActBound/AMASS/h36m_train_no_sit_30_qpos.pkl"
+    cfg.data_specs['test_file_path'] = "sample_data/h36m_train_no_sit_30_qpos.pkl"
     data_loader = DatasetSMPLObj(cfg.data_specs, data_mode="test")
     # data_loader.data_keys = [k for k in data_loader.data_keys if k.startswith(action)]
     data_loader.data_keys = data_loader.data_keys

@@ -45,7 +45,7 @@ class DatasetAMASSSingle:
 
         self.mode = data_specs.get("mode", "all")
         self.adaptive_iter = data_specs.get("adaptive_iter", -1)
-        self.netural_path = data_specs.get("neutral_path", "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl")
+        self.netural_path = data_specs.get("neutral_path", "sample_data/standing_neutral.pkl")
         self.netural_data = joblib.load(self.netural_path)
         self.data_mode = data_mode
 
@@ -101,11 +101,15 @@ class DatasetAMASSSingle:
             data_out["trans"][k] = (v["trans"] if v["trans"].shape[0] == v["pose_aa"].shape[0] else v["qpos"][:, :3])  # ZL: bug fix on some preprocessed dataset, can be removed
 
             # data_out["qpos"][k] = v["qpos"]
+
             data_out["beta"][k] = (np.repeat(
                 v["beta"][None,],
                 seq_len,
                 axis=0,
             ) if v["beta"].shape[0] != seq_len else v["beta"])
+
+            if data_out["beta"][k].shape[1] != 16:
+                data_out["beta"][k] = np.concatenate([data_out["beta"][k], np.zeros((seq_len, 16 - v["beta"].shape[1]))], axis=1)
 
             gender = (v["gender"].item() if isinstance(v["gender"], np.ndarray) else v["gender"])
             if isinstance(gender, bytes):
@@ -317,7 +321,7 @@ if __name__ == "__main__":
     np.random.seed(0)
     data_specs = {
         "dataset_name": "amass_rf",
-        "file_path": "/hdd/zen/data/ActBound/AMASS/amass_copycat_take1_test.pkl",
+        "file_path": "sample_data/amass_copycat_take1_test.pkl",
         "traj_dim": 144,
         "t_min": 90,
         "nc": 2,

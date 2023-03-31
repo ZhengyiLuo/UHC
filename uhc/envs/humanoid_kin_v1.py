@@ -48,7 +48,7 @@ class HumanoidKinEnv(HumanoidEnv):
         self.smpl_humanoid = Humanoid(model_file=kin_cfg.mujoco_model_file)
 
         self.netural_path = kin_cfg.data_specs.get(
-            "neutral_path", "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl"
+            "neutral_path", "sample_data/standing_neutral.pkl"
         )
         self.netural_data = joblib.load(self.netural_path)
 

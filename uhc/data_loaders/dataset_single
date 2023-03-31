@@ -46,7 +46,7 @@ class DatasetAMASSSingle:
         self.adaptive_iter = data_specs.get("adaptive_iter", -1)
         self.netural_path = data_specs.get(
             "neutral_path",
-            "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl")
+            "sample_data/standing_neutral.pkl")
         self.netural_data = joblib.load(self.netural_path)
         self.data_mode = data_mode
 
@@ -357,7 +357,7 @@ if __name__ == "__main__":
     data_specs = {
         "dataset_name": "amass_rf",
         "file_path":
-        "/hdd/zen/data/ActBound/AMASS/amass_copycat_take1_test.pkl",
+        "sample_data/amass_copycat_take1_test.pkl",
         "traj_dim": 144,
         "t_min": 90,
         "nc": 2,

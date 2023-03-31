@@ -45,8 +45,8 @@ reward_weights:
 
 data_specs:
   dataset_name: amass
-  file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take1.pkl
-  # file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take1_test.pkl
+  file_path: sample_data/amass_copycat_take1.pkl
+  # file_path: sample_data/amass_copycat_take1_test.pkl
   flip_cnd: 0
   has_smpl_root: true
   traj_dim: 144

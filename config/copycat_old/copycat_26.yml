@@ -65,24 +65,24 @@ reward_weights:
 
 data_specs:
   dataset_name: amass
-  file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take4.pkl
-  # file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_test_singles.pkl
-  # file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_test.pkl
-  state_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_states_obs_v2.pkl
-  # state_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take3_test_states.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take2.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take2_test.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/amass_copycat_take2_test_singles.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_mocap_qpos_grad.pkl
-  test_file_path: /hdd/zen/data/ActBound/AMASS/egopose_mocap_qpos.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_ar_qpos.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_wild_qpos.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_ar_qpos.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/standing_neutral_qpos.pkl
-  # test_file_path: /hdd/zen/data/ActBound/AMASS/relive_third_qpos.pkl
+  file_path: sample_data/amass_copycat_take4.pkl
+  # file_path: sample_data/amass_copycat_test_singles.pkl
+  # file_path: sample_data/amass_copycat_take3_test.pkl
+  state_file_path: sample_data/amass_copycat_take3_states_obs_v2.pkl
+  # state_file_path: sample_data/amass_copycat_take3_test_states.pkl
+  # test_file_path: sample_data/amass_copycat_take2.pkl
+  # test_file_path: sample_data/amass_copycat_take2_test.pkl
+  # test_file_path: sample_data/amass_copycat_take2_test_singles.pkl
+  # test_file_path: sample_data/relive_mocap_qpos_grad.pkl
+  test_file_path: sample_data/egopose_mocap_qpos.pkl
+  # test_file_path: sample_data/relive_ar_qpos.pkl
+  # test_file_path: sample_data/relive_wild_qpos.pkl
+  # test_file_path: sample_data/relive_ar_qpos.pkl
+  # test_file_path: sample_data/standing_neutral_qpos.pkl
+  # test_file_path: sample_data/relive_third_qpos.pkl
   # test_file_path: "/hdd/zen/data/copycat/seqs/AIST++/aist_qpos.pkl"
 
-  neutral_path: /hdd/zen/data/ActBound/AMASS/standing_neutral.pkl
+  neutral_path: sample_data/standing_neutral.pkl
   flip_cnd: 0
   has_smpl_root: true
   traj_dim: 144

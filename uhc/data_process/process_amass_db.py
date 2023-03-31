@@ -1,7 +1,8 @@
+import glob
 import os
 import sys
 import pdb
-
+import os.path as osp
 sys.path.append(os.getcwd())
 
 import numpy as np
@@ -70,12 +71,9 @@ def flip_smpl(pose, trans=None):
     Pose input batch * 72
     """
     curr_spose = sRot.from_rotvec(pose.reshape(-1, 3))
-    curr_spose_euler = curr_spose.as_euler("ZXY", degrees=False).reshape(
-        pose.shape[0], 24, 3)
+    curr_spose_euler = curr_spose.as_euler("ZXY", degrees=False).reshape(pose.shape[0], 24, 3)
     curr_spose_euler = left_to_rigth_euler(curr_spose_euler)
-    curr_spose_rot = sRot.from_euler("ZXY",
-                                     curr_spose_euler.reshape(-1, 3),
-                                     degrees=False)
+    curr_spose_rot = sRot.from_euler("ZXY", curr_spose_euler.reshape(-1, 3), degrees=False)
     curr_spose_aa = curr_spose_rot.as_rotvec().reshape(pose.shape[0], 24, 3)
     if trans != None:
         pass
@@ -107,8 +105,7 @@ def sample_seq_length(seq, tran, seq_length=150):
             start_points.append(i * seq_length + np.random.randint(-10, 10))
 
         if num_possible_seqs >= 2:
-            start_points.append(max_seq - seq_length -
-                                np.random.randint(0, 10))
+            start_points.append(max_seq - seq_length - np.random.randint(0, 10))
 
         seqs = [seq[i:(i + seq_length)] for i in start_points]
         trans = [tran[i:(i + seq_length)] for i in start_points]
@@ -143,9 +140,7 @@ def fix_height(expert, expert_meta, env):
     new_wpos = new_wpos.reshape(new_wpos.shape[0], 24, 3)
     ground_pene = min(np.min(new_wpos[:, 4, 2]), np.min(new_wpos[:, 8, 2]))
     if ground_pene < -0.15:
-        print(
-            f"{expert_meta['seq_name']} negative sequence invalid for copycat: {ground_pene}"
-        )
+        print(f"{expert_meta['seq_name']} negative sequence invalid for copycat: {ground_pene}")
         return None
     return new_expert
 
@@ -176,9 +171,7 @@ def fix_height_smpl(pose_aa, th_trans, th_betas, gender, seq_name):
         raise Exception("Gender Not Supported!!")
 
     batch_size = pose_aa.shape[0]
-    verts, jts = smpl_parser.get_joints_verts(pose_aa[0:1],
-                                              th_betas.repeat((1, 1)),
-                                              th_trans=th_trans[0:1])
+    verts, jts = smpl_parser.get_joints_verts(pose_aa[0:1], th_betas.repeat((1, 1)), th_trans=th_trans[0:1])
 
     # vertices = verts[0].numpy()
     gp = torch.min(verts[:, :, 2])
@@ -189,26 +182,47 @@ def fix_height_smpl(pose_aa, th_trans, th_betas, gender, seq_name):
 
     # if gp < 0:
     th_trans[:, 2] -= gp
-    verts, jts = smpl_parser.get_joints_verts(pose_aa,
-                                              th_betas.repeat((batch_size, 1)),
-                                              th_trans=th_trans)
+    verts, jts = smpl_parser.get_joints_verts(pose_aa, th_betas.repeat((batch_size, 1)), th_trans=th_trans)
 
-    conseq = count_consec(
-        torch.nonzero(torch.sum(jts[:, [10, 11], 2] > 0.2, axis=1) > 1))
+    conseq = count_consec(torch.nonzero(torch.sum(jts[:, [10, 11], 2] > 0.2, axis=1) > 1))
     if np.max(conseq) > 30:
         ## Too high
-        print(
-            f"{seq_name} too high sequence invalid for copycat: {np.max(conseq)}"
-        )
+        print(f"{seq_name} too high sequence invalid for copycat: {np.max(conseq)}")
         return None
     return th_trans
 
+def fix_height_smpl_vanilla(pose_aa, th_trans, th_betas, gender, seq_name):
+    # no filtering, just fix height
+    gender = gender.item() if isinstance(gender, np.ndarray) else gender
+    if isinstance(gender, bytes):
+        gender = gender.decode("utf-8")
+
+    if gender == "neutral":
+        smpl_parser = smpl_parser_n
+    elif gender == "male":
+        smpl_parser = smpl_parser_m
+    elif gender == "female":
+        smpl_parser = smpl_parser_f
+    else:
+        print(gender)
+        raise Exception("Gender Not Supported!!")
+
+    batch_size = pose_aa.shape[0]
+    verts, jts = smpl_parser.get_joints_verts(pose_aa[0:1], th_betas.repeat((1, 1)), th_trans=th_trans[0:1])
+
+    # vertices = verts[0].numpy()
+    gp = torch.min(verts[:, :, 2])
+
+    # if gp < 0:
+    th_trans[:, 2] -= gp
+
+    return th_trans
 
 def process_qpos_list(qpos_list):
     amass_res = {}
     removed_k = []
     pbar = qpos_list
-    for (k, v) in pbar:
+    for (k, v) in tqdm(pbar):
         # print("=" * 20)
         k = "0-" + k
         seq_name = k
@@ -220,27 +234,23 @@ def process_qpos_list(qpos_list):
         amass_trans = v["trans"][::skip]
 
         bound = amass_pose.shape[0]
-        # if k in amass_occlusion:
-        #     issue = amass_occlusion[k]["issue"]
-        #     if issue == "sitting" or issue == "airborne":
-        #         bound = amass_occlusion[k]["idxes"][
-        #             0
-        #         ]  # This bounded is calucaled assuming 30 FPS.....
-        #         if bound < 10:
-        #             print("bound too small", k, bound)
-        #             continue
-        #     else:
-        #         print("issue irrecoverable", k, issue)
-        #         continue
+        if k in amass_occlusion:
+            issue = amass_occlusion[k]["issue"]
+            if (issue == "sitting" or issue == "airborne") and "idxes" in amass_occlusion[k]:
+                bound = amass_occlusion[k]["idxes"][0]  # This bounded is calucaled assuming 30 FPS.....
+                if bound < 10:
+                    print("bound too small", k, bound)
+                    continue
+            else:
+                print("issue irrecoverable", k, issue)
+                continue
 
         seq_length = amass_pose.shape[0]
         if seq_length < 10:
             continue
         with torch.no_grad():
-            pose_aa = torch.tensor(
-                amass_pose)[:bound]  # After sampling the bound
-            amass_trans = torch.tensor(
-                amass_trans[:bound])  # After sampling the bound
+            pose_aa = torch.tensor(amass_pose)[:bound]  # After sampling the bound
+            amass_trans = torch.tensor(amass_trans[:bound])  # After sampling the bound
             betas = torch.from_numpy(betas)
             batch_size = pose_aa.shape[0]
 
@@ -254,9 +264,16 @@ def process_qpos_list(qpos_list):
             # if amass_trans is None:
             #     removed_k.append(k)
             #     continue
+            
+            amass_trans = fix_height_smpl_vanilla(
+                pose_aa=pose_aa,
+                th_betas=betas,
+                th_trans=amass_trans,
+                gender=gender,
+                seq_name=k,
+            )
 
-            pose_seq_6d = convert_aa_to_orth6d(torch.tensor(pose_aa)).reshape(
-                batch_size, -1, 6)
+            pose_seq_6d = convert_aa_to_orth6d(torch.tensor(pose_aa)).reshape(batch_size, -1, 6)
 
             amass_res[seq_name] = {
                 "pose_aa": pose_aa.numpy(),
@@ -277,10 +294,7 @@ def process_qpos_list(qpos_list):
 amass_splits = {
     'vald': ['HumanEva', 'MPI_HDM05', 'SFU', 'MPI_mosh'],
     'test': ['Transitions_mocap', 'SSM_synced'],
-    'train': [
-        'CMU', 'MPI_Limits', 'TotalCapture', 'Eyes_Japan_Dataset', 'KIT',
-        'BML', 'EKUT', 'TCD_handMocap', "BMLhandball", "DanceDB"
-    ]  #ACCAD
+    'train': ['CMU', 'MPI_Limits', 'TotalCapture', 'Eyes_Japan_Dataset', 'KIT', 'BML', 'EKUT', 'TCD_handMocap', "BMLhandball", "DanceDB", "ACCAD", "BMLmovi", "BioMotionLab", "Eyes", "DFaust"]  # Adding ACCAD
 }
 
 amass_split_dict = {}
@@ -295,79 +309,60 @@ if __name__ == "__main__":
 
     np.random.seed(0)
     flags.debug = args.debug
-    amass_base = "/hdd/zen/data/ActBound/AMASS/"
-    take_num = "copycat_take5_5"
-    # amass_cls_data = pk.load(open(os.path.join(amass_base, "amass_class.pkl"), "rb"))
+    # amass_base = "sample_data/"
+    amass_base = "/hdd/zen/data/ActBound/AMASS"
+    take_num = "copycat_take5"
     amass_seq_data = {}
     seq_length = -1
-    cfg = Config(cfg_id="copycat_30", create_dirs=False)
+    cfg = Config(cfg_id="uhc_implicit", create_dirs=False)
 
     data_loader = DatasetAMASSSingle(cfg.data_specs, data_mode="test")
-    # init_expert = data_loader.sample_seq()
-    # env = HumanoidEnv(
-    #     cfg, init_expert=init_expert, data_specs=cfg.data_specs, mode="test"
-    # )
-
-    # target_frs = [20,30,40] # target framerate
-    # target_frs = [30]  # target framerate
+    
     target_fr = 30
     video_annot = {}
     counter = 0
     seq_counter = 0
-    amass_db = joblib.load("/hdd/zen/data/ActBound/AMASS/amass_db_smplx.pt")
-    amass_occlusion = joblib.load(
-        "/hdd/zen/data/ActBound/AMASS/amass_copycat_occlusion.pkl")
+    db_dataset = osp.join(amass_base, "amass_db_smplx.pt")
+    assert(osp.exists(db_dataset), "AMASS DB not found")
+    amass_db = joblib.load(db_dataset)
+    amass_occlusion = joblib.load("sample_data/amass_copycat_occlusion_v2.pkl")
 
     model_file = f"assets/mujoco_models/humanoid_smpl_neutral_mesh.xml"
     humanoid_model = load_model_from_path(model_file)
 
-    # key = "CMU_36_36_05_poses"
-    # amass_db = {key: amass_db[key]}
 
     qpos_list = list(amass_db.items())
     np.random.seed(0)
     np.random.shuffle(qpos_list)
-    smpl_parser_n = SMPLH_Parser(model_path="data/smpl",
-                                 gender="neutral",
-                                 use_pca=False,
-                                 create_transl=False)
-    smpl_parser_m = SMPLH_Parser(model_path="data/smpl",
-                                 gender="male",
-                                 use_pca=False,
-                                 create_transl=False)
-    smpl_parser_f = SMPLH_Parser(model_path="data/smpl",
-                                 gender="female",
-                                 use_pca=False,
-                                 create_transl=False)
+    smpl_parser_n = SMPLH_Parser(model_path="data/smpl", gender="neutral", use_pca=False, create_transl=False)
+    smpl_parser_m = SMPLH_Parser(model_path="data/smpl", gender="male", use_pca=False, create_transl=False)
+    smpl_parser_f = SMPLH_Parser(model_path="data/smpl", gender="female", use_pca=False, create_transl=False)
 
     # import ipdb; ipdb.set_trace()
-    ## Debug
     amass_seq_data = process_qpos_list(qpos_list)
-    if flags.debug:
-        amass_output_file_name = "/hdd/zen/data/ActBound/AMASS/amass_{}_test.pkl".format(
-            take_num)
-    else:
-        amass_output_file_name = "/hdd/zen/data/ActBound/AMASS/amass_{}.pkl".format(
-            take_num)
-    print(amass_output_file_name, len(amass_seq_data))
-    joblib.dump(amass_seq_data, open(amass_output_file_name, "wb"))
+     
 
-    # train_data = {}
-    # test_data = {}
-    # vald_data = {}
-    # for k, v in amass_seq_data.items():
-    #     start_name = k.split("-")[1]
-    #     for dataset_key in amass_split_dict.keys():
-    #         if start_name.startswith(dataset_key):
-    #             split = amass_split_dict[dataset_key]
-    #             if split == "train":
-    #                 train_data[k] = v
-    #             elif split == "test":
-    #                 test_data[k] = v
-    #             elif split == "vald":
-    #                 vald_data[k] = v;
+    train_data = {}
+    test_data = {}
+    valid_data = {}
+    for k, v in amass_seq_data.items():
+        start_name = k.split("-")[1]
+        found = False
+        for dataset_key in amass_split_dict.keys():
+            if start_name.lower().startswith(dataset_key.lower()):
+                found = True
+                split = amass_split_dict[dataset_key]
+                if split == "test":
+                    test_data[k] = v
+                elif split == "valid":
+                    valid_data[k] = v
+                else:
+                    train_data[k] = v
+        if not found:
+            print(f"Not found!! {start_name}")
 
-    # joblib.dump(train_data, f"/hdd/zen/data/ActBound/AMASS/amass_{take_num}_train.pkl")
-    # joblib.dump(test_data, f"/hdd/zen/data/ActBound/AMASS/amass_{take_num}_test.pkl")
-    # joblib.dump(vald_data,
-    #             f"/hdd/zen/data/ActBound/AMASS/amass_{take_num}_vald.pkl")
+    import ipdb
+    ipdb.set_trace()
+    joblib.dump(train_data, f"sample_data/amass_{take_num}_train.pkl")
+    joblib.dump(test_data, f"sample_data/amass_{take_num}_test.pkl")
+    joblib.dump(valid_data, f"sample_data/amass_{take_num}_valid.pkl")

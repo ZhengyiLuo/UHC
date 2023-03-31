@@ -172,16 +172,16 @@ def smpl_2_entry(
 if __name__ == "__main__":
     data_dir = "/hdd/zen/dev/copycat/MST10192 Final Working/sample.pkl"
     # data_dir = '/hdd/zen/data/video_pose/prox/results/sample.pkl'
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/h36m_test_30_fitted_grad.pkl"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/h36m_train_30_fitted_grad_test.pkl"
+    # data_dir = "sample_data/h36m_test_30_fitted_grad.pkl"
+    # data_dir = "sample_data/h36m_train_30_fitted_grad_test.pkl"
     # data_dir = "/hdd/zen/data/video_pose/h36m/data_fit/h36m_train_30_fitted_grad_full.p"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/h36m_train_30_fitted_grad.pkl"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/egopose_mocap_smpl_grad.pkl"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/h36m_all_smpl.pkl"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/relive_mocap_smpl_grad.pkl"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/relive_wild_smpl.pkl"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/relive_ar_smpl.pkl"
-    # data_dir = "/hdd/zen/data/ActBound/AMASS/relive_third_smpl.pkl"
+    # data_dir = "sample_data/h36m_train_30_fitted_grad.pkl"
+    # data_dir = "sample_data/egopose_mocap_smpl_grad.pkl"
+    # data_dir = "sample_data/h36m_all_smpl.pkl"
+    # data_dir = "sample_data/relive_mocap_smpl_grad.pkl"
+    # data_dir = "sample_data/relive_wild_smpl.pkl"
+    # data_dir = "sample_data/relive_ar_smpl.pkl"
+    # data_dir = "sample_data/relive_third_smpl.pkl"
     # data_dir = "/hdd/zen/data/copycat/seqs/AIST++/aist_smpl.pkl"
     # fix_feet = False
     fix_feet = True
@@ -228,18 +228,18 @@ if __name__ == "__main__":
         # if counter > 10:
         # break
 
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/h36m_all_qpos.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/relive_mocap_qpos_grad.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/relive_wild_qpos.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/relive_ar_qpos.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/relive_third_qpos.pkl"
+    # output_file_name = "sample_data/h36m_all_qpos.pkl"
+    # output_file_name = "sample_data/relive_mocap_qpos_grad.pkl"
+    # output_file_name = "sample_data/relive_wild_qpos.pkl"
+    # output_file_name = "sample_data/relive_ar_qpos.pkl"
+    # output_file_name = "sample_data/relive_third_qpos.pkl"
     # output_file_name = "/hdd/zen/data/copycat/seqs/AIST++/aist_qpos.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/egopose_mocap_qpos_grad.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/h36m_train_30_qpos.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/h36m_test_30_qpos.pkl"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/h36m_train_30_qpos_test.pkl"
+    # output_file_name = "sample_data/egopose_mocap_qpos_grad.pkl"
+    # output_file_name = "sample_data/h36m_train_30_qpos.pkl"
+    # output_file_name = "sample_data/h36m_test_30_qpos.pkl"
+    # output_file_name = "sample_data/h36m_train_30_qpos_test.pkl"
     # output_file_name = "/hdd/zen/data/video_pose/h36m/data_fit/h36m_train_30_fitted_grad_qpos_full.p"
-    # output_file_name = "/hdd/zen/data/ActBound/AMASS/prox_sample.pkl"
-    output_file_name = "/hdd/zen/data/ActBound/AMASS/dais_sample.pkl"
+    # output_file_name = "sample_data/prox_sample.pkl"
+    output_file_name = "sample_data/dais_sample.pkl"
     print(output_file_name, len(data_res))
     joblib.dump(data_res, open(output_file_name, "wb"))

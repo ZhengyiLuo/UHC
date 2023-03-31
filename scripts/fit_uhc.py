@@ -54,7 +54,7 @@ if __name__ == "__main__":
     flags.debug = args.debug
 
     if args.debug:
-        # cfg.data_specs['file_path'] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take3_test.pkl"
+        # cfg.data_specs['file_path'] = "sample_data/amass_copycat_take3_test.pkl"
         cfg.num_threads = 1
         cfg.no_log = True
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     if args.show_single:
         cfg.data_specs[
             "file_path"
-        ] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5_single.pkl"
+        ] = "sample_data/amass_copycat_take5_single.pkl"
         agent = AgentCopycat(cfg, dtype, device, training=True, checkpoint_epoch=0)
         take_key = "0-DanceDB_20140506_AnnaCortesi_AnnaCortesi_BellyDance2_C3D_poses"
         agent.load_curr()

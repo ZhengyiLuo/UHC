@@ -16,7 +16,7 @@ if __name__ == "__main__":
     
     cfg = Config("copycat_1", "train", create_dirs=False)
     env = HumanoidEnv(cfg)
-    amass_cc = joblib.load("/hdd/zen/data/ActBound/AMASS/amass_copycat_take1.pkl")
+    amass_cc = joblib.load("sample_data/amass_copycat_take1.pkl")
     amass_data = amass_cc['0-ACCAD_Male1General_c3d_General A1 - Stand_poses']
     neutral_dump = {}
 
@@ -32,5 +32,5 @@ if __name__ == "__main__":
     neutral_dump['qpos'][2] = 0.91437225
     neutral_dump['qvel'] = expert['qvel'][10, :]
 
-    joblib.dump(neutral_dump, "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl")
+    joblib.dump(neutral_dump, "sample_data/standing_neutral.pkl")
 

@@ -235,7 +235,7 @@ if __name__ == "__main__":
     # cfg.mujoco_model_file = f"humanoid_smpl_neutral_mesh_all_h36m.xml"
     cfg.data_specs[
         "file_path"
-    ] = "/hdd/zen/data/ActBound/AMASS/h36m_train_no_sit_30_qpos.pkl"
+    ] = "sample_data/h36m_train_no_sit_30_qpos.pkl"
     data_loader = DatasetAMASSSingle(cfg.data_specs, data_mode="test")
     init_expert = data_loader.sample_seq()
     env = HumanoidEnv(

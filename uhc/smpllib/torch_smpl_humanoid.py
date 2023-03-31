@@ -499,7 +499,7 @@ if __name__ == "__main__":
     converter = SMPLConverter(smpl_model, sim_model)
     # # occup_joints = ['LeftFoot', 'RightFoot', 'LeftHand', 'RightHand', 'Hips']
 
-    data_load = joblib.load("/hdd/zen/data/ActBound/AMASS/relive_mocap_qpos_grad.pkl")
+    data_load = joblib.load("sample_data/relive_mocap_qpos_grad.pkl")
     for k in data_load.keys():
         expert_qpos = data_load[k]["qpos"]
         eval_expert(converter.qpos_smpl_2_new(expert_qpos))

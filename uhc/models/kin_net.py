@@ -100,7 +100,7 @@ class KinNet(nn.Module):
 
         # Netural data
         self.netural_data = joblib.load(
-            "/hdd/zen/data/ActBound/AMASS/standing_neutral.pkl"
+            "sample_data/standing_neutral.pkl"
         )
         fk_res = self.fk_model.qpos_fk(
             torch.from_numpy(

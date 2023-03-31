@@ -51,7 +51,7 @@ if __name__ == "__main__":
     flags.debug = args.debug
 
     if args.debug:
-        cfg.data_specs["file_path"] = "/hdd/zen/data/ActBound/AMASS/amass_copycat_take5_test.pkl"
+        cfg.data_specs["file_path"] = "sample_data/amass_copycat_take5_test.pkl"
         cfg.num_threads = 1
         cfg.no_log = True
 

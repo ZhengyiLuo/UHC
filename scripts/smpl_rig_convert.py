@@ -63,7 +63,7 @@ qpos_all[:, :3] = trans
 # rots = np.repeat(np.array([1, 0, 0, 0])[None, :], repeats = kin_qpose.shape[0], axis = 0)
 # rots = np.repeat(np.array([0.7071, 0.7071, 0, 0])[None, :], repeats = kin_qpose.shape[0], axis = 0)
 
-# test_data = joblib.load("/hdd/zen/data/ActBound/AMASS/relive_all_smpl.pkl")
+# test_data = joblib.load("sample_data/relive_all_smpl.pkl")
 # amass_data = test_data['sit']['1001_take_01']
 # smpl_pose = amass_data['pose_aa']
 # trans = amass_data['trans']
