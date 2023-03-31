@@ -88,6 +88,7 @@ python uhc/data_process/process_smpl_data.py
 ## Trained models
 
 Download pretrained models: 
+- Implicit RFC + Shape variation: [download](https://drive.google.com/file/d/16FI_Ga2iE3zfP93_XgRSVVCTL6zkDEJ_/view?usp=share_link)
 - Implicit RFC: [download](https://drive.google.com/file/d/1CA3lKhIEOwzhX7IMdu_B_QnjrXfPXYnM/view?usp=share_link)
 - Explicit RFC [download](https://drive.google.com/file/d/1wdsS0wRji3vFY6xvORptVdFEJLyY_I1T/view?usp=share_link)
 
