@@ -108,7 +108,7 @@ python scripts/eval_uhc.py --cfg uhc_explicit --epoch 5000 --data sample_data/am
 ## Training models
 
 ```
-python scripts/train_uhc.py --cfg uhc_implicit
+python scripts/train_uhc.py --cfg uhc_implicit_shape
 ```
 
 ## Viewer Shortcuts
