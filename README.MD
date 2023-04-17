@@ -105,6 +105,8 @@ python scripts/eval_uhc.py --cfg uhc_implicit_shape --epoch 4700 --data sample_d
 python scripts/eval_uhc.py --cfg uhc_explicit --epoch 5000 --data sample_data/amass_copycat_take5_test_small.pkl
 ```
 
+For computing statistics (mpjpe, success rate, etc.), use the `--mode stats` command. 
+
 ## Training models
 
 ```
