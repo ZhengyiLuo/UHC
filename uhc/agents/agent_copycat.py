@@ -473,6 +473,13 @@ class AgentCopycat(AgentPPO):
                         next_state = self.running_state(next_state, update=False)
 
                     if done:
+                        
+                        res["gt"].append(self.env.get_expert_attr("qpos", self.env.get_expert_index(t)).copy()) # collect the last simulation state.
+                        res["pred"].append(self.env.data.qpos.copy())
+
+                        res["gt_jpos"].append(self.env.get_expert_attr("wbpos", self.env.get_expert_index(t)).copy())
+                        res["pred_jpos"].append(self.env.get_wbody_pos().copy())
+                        
                         if self.cfg.fail_safe and info["percent"] != 1:
                             self.env.fail_safe()
                             fail_safe = True

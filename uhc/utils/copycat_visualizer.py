@@ -54,6 +54,7 @@ class CopycatVisualizer(Visualizer):
                     self.cur_key = take_key
                     print(f"Generating for {take_key} seqlen: {loader.get_sample_len_from_key(take_key)}")
                     eval_res = self.agent.eval_seq(take_key, loader)
+                    
                     print(
                         "Agent Mass:",
                         mujoco_py.functions.mj_getTotalmass(self.agent.env.model),

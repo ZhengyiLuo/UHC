@@ -28,7 +28,7 @@ sample_data/
 *.exe
 *.o
 *.so
-*.pyc
+# *.pyc
 *.so
 *.egg-info
 # Packages #

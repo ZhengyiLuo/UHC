@@ -1231,9 +1231,11 @@ class HumanoidEnv(mujoco_env.MujocoEnv):
         # body_fail = False  # PHC-eval
 
         fail = fail or body_fail
-        end = (self.cur_t >= cfg.env_episode_len) or (self.cur_t + self.start_ind >= self.expert["len"] + cfg.env_expert_trail_steps - 1)
+        
+        end = (self.cur_t >= cfg.env_episode_len) or (self.cur_t + self.start_ind >= self.expert["len"] + cfg.env_expert_trail_steps - 1) # here we -1 because we start from index 0. 
         done = fail or end
         # if done:
+        #     import ipdb; ipdb.set_trace()
         #     print("done!!!", fail, end)
 
         percent = self.cur_t / (self.expert["len"] - 1)
