@@ -16,6 +16,8 @@ TODOS:
 
 ## News 🚩
 
+[June 5th, 2023 ] Since there is a growing interest in using smpl_robot in Isaac (e.g. in [Trace & Pace](https://research.nvidia.com/labs/toronto-ai/trace-pace/)), I uploaded `smpl_local_robot.py` that is compatible with Isaac. 
+
 [March 31, 2023 ] Adding the implicit-shape model. Implicit RFC + training with different SMPL body shapes. Adding AMASS data processing code.
 
 [February 24, 2023 ] Full code runnable
@@ -62,6 +64,15 @@ The SMPL robot, an adaption of Robot class from [Transform2Act](https://github.c
 python uhc/smpllib/smpl_robot.py
 
 ```
+
+To generate Isaac Gym comptialbe humanoid models, use:
+
+```
+python uhc/smpllib/smpl_local_robot.py 
+```
+
+This model supports mesh and non-mesh based humanoid used in [Trace & Pace](https://research.nvidia.com/labs/toronto-ai/trace-pace/). There is a number of setting you can play with like "upright_start", which generates a humanoid that that starts in an upright position facing x-direcation (default SMPL faces upward). 
+
 You will need to have downloaded smpl model files from [SMPL](https://smpl.is.tue.mpg.de/), [SMPL-H](https://smpl.is.tue.mpg.de/downloads), and [SMPL-X](https://smpl-x.is.tue.mpg.de/downloads).
 
 
