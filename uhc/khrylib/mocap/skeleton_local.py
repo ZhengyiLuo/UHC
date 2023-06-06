@@ -13,6 +13,7 @@ import re
 import numpy as np
 import joblib
 from scipy.spatial.transform import Rotation as sRot
+from uhc.utils.flags import flags
 
 TEMPLATE_FILE = "assets/mujoco_models/humanoid_template_local.xml"
 GEOM_TYPES = {
@@ -35,11 +36,13 @@ GEOM_TYPES = {
     'L_Elbow': 'capsule',
     'L_Wrist': 'capsule',
     'L_Hand': 'sphere',
+    # 'L_Hand': 'box',
     'R_Thorax': 'capsule',
     'R_Shoulder': 'capsule',
     'R_Elbow': 'capsule',
     'R_Wrist': 'capsule',
     'R_Hand': 'sphere',
+    # 'R_Hand': 'box',
 }
 
 GAINS = {
@@ -70,6 +73,7 @@ GAINS = {
 
 
 class Bone:
+
     def __init__(self):
         # original bone info
         self.id = None
@@ -94,6 +98,7 @@ class Bone:
 
 
 class Skeleton:
+
     def __init__(self):
         self.bones = []
         self.name2bone = {}
@@ -119,9 +124,10 @@ class Skeleton:
         spec_channels=None,
         upright_start=False,
         remove_toe=False,
+        freeze_hand= False,
         real_weight_porpotion=False,
         real_weight=False,
-        big_ankle =  False,
+        big_ankle=False,
     ):
         if channels is None:
             channels = ["x", "y", "z"]
@@ -135,9 +141,8 @@ class Skeleton:
         self.real_weight_porpotion = real_weight_porpotion
         self.real_weight = real_weight
         self.big_ankle = big_ankle
-        joint_names = list(
-            filter(lambda x: all([t not in x for t in exclude_bones]),
-                   offsets.keys()))
+        self.freeze_hand = freeze_hand
+        joint_names = list(filter(lambda x: all([t not in x for t in exclude_bones]), offsets.keys()))
         dof_ind = {"x": 0, "y": 1, "z": 2}
         self.len_scale = scale
         self.root = Bone()
@@ -152,8 +157,7 @@ class Skeleton:
             bone.id = i + 1
             bone.name = joint
 
-            bone.channels = (spec_channels[joint]
-                             if joint in spec_channels.keys() else channels)
+            bone.channels = (spec_channels[joint] if joint in spec_channels.keys() else channels)
             bone.dof_index = [dof_ind[x] for x in bone.channels]
             bone.offset = np.array(offsets[joint]) * self.len_scale
             bone.lb = np.rad2deg(jrange[joint][:, 0])
@@ -207,10 +211,7 @@ class Skeleton:
             attr["gear"] = "1"
             SubElement(actuators, "motor", attr)
         if bump_buffer:
-            SubElement(tree.getroot(), "size", {
-                "njmax": "700",
-                "nconmax": "700"
-            })
+            SubElement(tree.getroot(), "size", {"njmax": "700", "nconmax": "700"})
         tree.write(fname, pretty_print=True)
 
     def write_str(
@@ -239,10 +240,7 @@ class Skeleton:
             attr["gear"] = "500"
             SubElement(actuators, "motor", attr)
         if bump_buffer:
-            SubElement(tree.getroot(), "size", {
-                "njmax": "700",
-                "nconmax": "700"
-            })
+            SubElement(tree.getroot(), "size", {"njmax": "700", "nconmax": "700"})
 
         return etree.tostring(tree, pretty_print=False)
 
@@ -264,16 +262,14 @@ class Skeleton:
                 j_attr = dict()
                 j_attr["name"] = bone.name + "_" + self.dof_name[ind]
                 j_attr["type"] = "hinge"
-                j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos +
-                                                                   offset))
+                j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos + offset))
                 j_attr["axis"] = "{0:.4f} {1:.4f} {2:.4f}".format(*axis)
-                j_attr["stiffness"] = str(GAINS[bone.name][0]  )
+                j_attr["stiffness"] = str(GAINS[bone.name][0])
                 j_attr["damping"] = str(GAINS[bone.name][1])
                 j_attr["armature"] = "0.02"
 
                 if i < len(bone.lb):
-                    j_attr["range"] = "{0:.4f} {1:.4f}".format(
-                        bone.lb[i], bone.ub[i])
+                    j_attr["range"] = "{0:.4f} {1:.4f}".format(bone.lb[i], bone.ub[i])
                 else:
                     j_attr["range"] = "-180.0 180.0"
                 if j_attr["name"] in ref_angles.keys():
@@ -283,12 +279,15 @@ class Skeleton:
 
         # write geometry
         g_attr = dict()
+        if not self.freeze_hand:
+            GEOM_TYPES['L_Hand'] = 'box'
+            GEOM_TYPES['R_Hand'] = 'box'
         g_attr["type"] = GEOM_TYPES[bone.name]
         g_attr["contype"] = "1"
         g_attr["conaffinity"] = "1"
         if self.real_weight:
             base_density = 1000
-        else:
+        else: 
             base_density = 500
         g_attr["density"] = str(base_density)
         e1 = np.zeros(3)
@@ -301,28 +300,23 @@ class Skeleton:
         # if bone.name in ["L_Hip"]:
         #     seperation = 0.3
 
-
         e1 += e2 * seperation
         e2 -= e2 * seperation
         hull_params = self.hull_dict[bone.name]
 
         if g_attr["type"] == "capsule":
-            g_attr[
-                "fromto"] = "{0:.4f} {1:.4f} {2:.4f} {3:.4f} {4:.4f} {5:.4f}".format(
-                    *np.concatenate([e1, e2]))
+            g_attr["fromto"] = "{0:.4f} {1:.4f} {2:.4f} {3:.4f} {4:.4f} {5:.4f}".format(*np.concatenate([e1, e2]))
 
             side_len = np.linalg.norm(e2 - e1)
             # radius = 0.067
             # V = np.pi * radius ** 2 * ((4/3) * radius + side_len)
 
-            roots = np.polynomial.polynomial.Polynomial(
-                [-hull_params['volume'], 0, side_len * np.pi,
-                 4 / 3 * np.pi]).roots()
+            roots = np.polynomial.polynomial.Polynomial([-hull_params['volume'], 0, side_len * np.pi, 4 / 3 * np.pi]).roots()
             real_valued = roots.real[abs(roots.imag) < 1e-5]
             real_valued = real_valued[real_valued > 0]
             if bone.name in ["Torso", "Spine", "L_Hip", "R_Hip"]:
                 real_valued *= 0.7  # ZL Hack: shrinkage
-                if self.real_weight_porpotion: # If shift is enabled, shift the weight based on teh shrinkage factor
+                if self.real_weight_porpotion:  # If shift is enabled, shift the weight based on teh shrinkage factor
                     g_attr["density"] = str((1 / 0.7**2) * base_density)
 
             if bone.name in ["Chest"]:
@@ -353,8 +347,9 @@ class Skeleton:
             else:
                 size[1] = hull_params['volume'] / (size[2] * size[0])
             size /= 2
-
+            
             if bone.name == "L_Toe" or bone.name == "R_Toe":
+                
                 if self.upright_start:
                     pos[2] = -bone.pos[2] / 2 - self.size_buffer[bone.parent.name][2] + size[2]  # To get toe to be at the same height as the parent
                     pos[1] = -bone.pos[1] / 2  # To get toe to be at the same x as the parent
@@ -370,7 +365,7 @@ class Skeleton:
             if not self.remove_toe:
                 rot = np.array([1, 0, 0, 0])
             else:
-                rot = sRot.from_euler("xyz",[0, 0, np.arctan(bone_dir[1] / bone_dir[0])]).as_quat()[[3, 0, 1, 2]]
+                rot = sRot.from_euler("xyz", [0, 0, np.arctan(bone_dir[1] / bone_dir[0])]).as_quat()[[3, 0, 1, 2]]
 
             if self.big_ankle:
                 # Big ankle override
@@ -380,15 +375,18 @@ class Skeleton:
                 size = max_verts - min_verts
 
                 bone_end = bone.end
-                pos = (max_verts + min_verts)/2
+                pos = (max_verts + min_verts) / 2
                 size /= 2
 
                 if bone.name == "L_Toe" or bone.name == "R_Toe":
                     parent_min, parent_max = self.hull_dict[bone.parent.name]['norm_verts'].min(axis=0).values, self.hull_dict[bone.parent.name]['norm_verts'].max(axis=0).values
-                    parent_pos = (parent_max + parent_min)/2
-
-                    pos[2] = parent_min[2] - bone.pos[2] + size[2]  # To get toe to be at the same height as the parent
-                    pos[1] =  parent_pos[1] - bone.pos[1]   # To get toe to be at the y as the parent
+                    parent_pos = (parent_max + parent_min) / 2
+                    if self.upright_start:
+                        pos[2] = parent_min[2] - bone.pos[2] + size[2]  # To get toe to be at the same height as the parent
+                        pos[1] = parent_pos[1] - bone.pos[1]  # To get toe to be at the y as the parent
+                    else:
+                        pos[1] = parent_min[1] - bone.pos[1] + size[1]  # To get toe to be at the same height as the parent
+                        pos[0] = parent_pos[0] - bone.pos[0]  # To get toe to be at the y as the parent
 
                 rot = np.array([1, 0, 0, 0])
                 if self.real_weight_porpotion:
@@ -397,8 +395,6 @@ class Skeleton:
                 g_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*pos)
                 g_attr["size"] = "{0:.4f} {1:.4f} {2:.4f}".format(*size)
                 g_attr["quat"] = "{0:.4f} {1:.4f} {2:.4f} {3:.4f}".format(*rot)
-
-
 
             if self.real_weight_porpotion:
                 g_attr["density"] = str((hull_params['volume'] / (size[0] * size[1] * size[2] * 8)) * base_density)

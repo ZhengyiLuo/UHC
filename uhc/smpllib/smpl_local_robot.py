@@ -2369,7 +2369,7 @@ if __name__ == "__main__":
     robot_cfg = {
         "mesh": False,
         "rel_joint_lm": False,
-        "upright_start": True,
+        "upright_start": False,
         "remove_toe": False,
         "real_weight": True,
         "real_weight_porpotion": True,
