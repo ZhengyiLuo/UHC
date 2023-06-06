@@ -4,13 +4,41 @@ from lxml import etree
 import math
 import numpy as np
 from uhc.utils.transformation import quaternion_from_matrix
+from scipy.spatial.transform import Rotation as sRot
 
-# TEMPLATE_FILE = "assets/mujoco_models/template/humanoid_template_design.xml"
-# TEMPLATE_FILE = "assets/mujoco_models/template/humanoid_template.xml"
-TEMPLATE_FILE = "assets/mujoco_models/template/humanoid_template_local.xml"
+# TEMPLATE_FILE = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template_design.xml"
+# TEMPLATE_FILE = "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/template/humanoid_template.xml"
+TEMPLATE_FILE = "assets/mujoco_models/humanoid_template_local.xml"
+
+GAINS = {
+    "L_Hip": [500, 50, 1, 500],
+    "L_Knee": [500, 50, 1, 500],
+    "L_Ankle": [400, 40, 1, 500],
+    "L_Toe": [200, 20, 1, 500],
+    "R_Hip": [500, 50, 1, 500],
+    "R_Knee": [500, 50, 1, 500],
+    "R_Ankle": [400, 40, 1, 500],
+    "R_Toe": [200, 20, 1, 500],
+    "Torso": [1000, 100, 1, 500],
+    "Spine": [1000, 100, 1, 500],
+    "Chest": [1000, 100, 1, 500],
+    "Neck": [100, 10, 1, 250],
+    "Head": [100, 10, 1, 250],
+    "L_Thorax": [400, 40, 1, 500],
+    "L_Shoulder": [400, 40, 1, 500],
+    "L_Elbow": [300, 30, 1, 150],
+    "L_Wrist": [100, 10, 1, 150],
+    "L_Hand": [100, 10, 1, 150],
+    "R_Thorax": [400, 40, 1, 150],
+    "R_Shoulder": [400, 40, 1, 250],
+    "R_Elbow": [300, 30, 1, 150],
+    "R_Wrist": [100, 10, 1, 150],
+    "R_Hand": [100, 10, 1, 150],
+}
 
 
 class Bone:
+
     def __init__(self):
         # original bone info
         self.id = None
@@ -27,10 +55,12 @@ class Bone:
 
         # inferred info
         self.pos = np.zeros(3)
+        self.bone = np.zeros(3)
         self.ends = []
 
 
 class Skeleton:
+
     def __init__(self, model_dir):
         self.model_dir = model_dir
         self.bones = []
@@ -61,11 +91,15 @@ class Skeleton:
         sites,
         scale,
         equalities,
+        hull_dict,
         exclude_contacts=None,
         collision_groups=None,
         conaffinity=None,
         simple_geom=False,
         color_dict=None,
+        real_weight=False,
+        replace_feet=True,
+        upright_start=False,
     ):
         if exclude_contacts is None:
             exclude_contacts = []
@@ -74,7 +108,12 @@ class Skeleton:
         self.exclude_contacts = exclude_contacts
         self.collision_groups = {}
         self.conaffinity = {}
-        self.color_dict = color_dict
+        self.color_dict = color_dict  # giving color to the meshes
+        self.real_weight = real_weight
+        self.real_weight_porpotion = True
+        self.replace_feet = replace_feet
+        self.hull_dict = hull_dict
+        self.upright_start = upright_start
 
         for group, bones in collision_groups.items():
             for bone in bones:
@@ -124,7 +163,14 @@ class Skeleton:
         for bone in self.bones:
             if len(bone.child) == 0:
                 bone.ends.append(bone.pos.copy())
+                bone.end = bone.pos.copy() + 0.002
+                for c_bone, p_bone in parents.items():
+                    if p_bone == bone.name:
+                        bone.end += np.array(offsets[c_bone]) * self.len_scale
+                        break
             else:
+                bone.end = sum([bone_c.pos
+                                for bone_c in bone.child]) / len(bone.child)
                 for bone_c in bone.child:
                     bone.ends.append(bone_c.pos.copy())
 
@@ -184,15 +230,20 @@ class Skeleton:
         asset = tree.getroot().find("asset")
         for bone in self.bones:
             if os.path.exists(f"{self.model_dir}/geom/{bone.name}.stl"):
-                # attr = {"file": f"{self.model_dir}/geom/{bone.name}.stl", "name": f"{bone.name}_mesh"}
-                geom_relative_path = f'../mesh/smpl/{self.model_dir.split("/")[-1]}'
-                attr = {"file": f"{geom_relative_path}/geom/{bone.name}.stl", "name": f"{bone.name}_mesh"}
+                attr = {
+                    "file":
+                    f"{self.model_dir.split('/')[-1]}/geom/{bone.name}.stl",
+                    "name": f"{bone.name}_mesh"
+                }
+                # geom_relative_path = f'../mesh/smpl/{self.model_dir.split("/")[-1]}'
+                # attr = {"file": f"{geom_relative_path}/geom/{bone.name}.stl", "name": f"{bone.name}_mesh"}
                 SubElement(asset, "mesh", attr)
 
         # create actuators
         actuators = tree.getroot().find("actuator")
+
         joints = worldbody.findall(".//joint")
-        for joint in joints[1:]:
+        for joint in joints:
             name = joint.attrib["name"]
             attr = dict()
             attr["name"] = name
@@ -222,6 +273,11 @@ class Skeleton:
         return tree
 
     def write_xml_bodynode(self, bone, parent_node, offset, ref_angles):
+        if self.real_weight:
+            base_density = 1000
+        else:
+            base_density = 500
+
         attr = dict()
         attr["name"] = bone.name
         attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos + offset))
@@ -233,29 +289,34 @@ class Skeleton:
         if bone.parent is None:
             j_attr = dict()
             j_attr["name"] = bone.name
-            j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos +
-                                                               offset))
-            j_attr["limited"] = "false"
-            j_attr["type"] = "free"
-            j_attr["armature"] = "0"
-            j_attr["damping"] = "0"
-            j_attr["stiffness"] = "0"
-            j_attr["frictionloss"] = "0"
-            if bone.name in ["L_Ankle", "R_Ankle", "L_Toe", "R_Toe"]:
-                j_attr["frictionloss"] = "500"
-                
-            SubElement(node, "joint", j_attr)
+            # j_attr["limited"] = "false"
+            # j_attr["type"] = "free"
+            # j_attr["armature"] = "0.02"
+            # j_attr["damping"] = "50"
+            # j_attr["stiffness"] = "500"
+            # j_attr["frictionloss"] = "0"
+
+            SubElement(node, "freejoint", j_attr)
         else:
 
             for i in range(len(bone.channels)):
                 ind = bone.dof_index[i]
                 axis = bone.orient[:, ind]
                 j_attr = dict()
+
                 j_attr["name"] = bone.name + "_" + bone.channels[i]
                 j_attr["type"] = "hinge"
                 j_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*(bone.pos +
                                                                    offset))
                 j_attr["axis"] = "{0:.4f} {1:.4f} {2:.4f}".format(*axis)
+
+                j_attr["stiffness"] = str(GAINS[bone.name][0])
+                j_attr["damping"] = str(GAINS[bone.name][1])
+                if bone.name in ["L_Ankle", "R_Ankle"]:
+                    j_attr["armature"] = "0.01"
+                else:
+                    j_attr["armature"] = "0.02"
+
                 if i < len(bone.lb):
                     j_attr["range"] = "{0:.4f} {1:.4f}".format(
                         bone.lb[i], bone.ub[i])
@@ -274,13 +335,12 @@ class Skeleton:
             s_attr["size"] = "0.03"
             SubElement(node, "site", s_attr)
 
-        # write geometry
         geom_path = f"{self.model_dir}/geom/{bone.name}.stl"
-
         if os.path.exists(geom_path):
             g_attr = {"type": "mesh", "mesh": f"{bone.name}_mesh"}
             if bone.name in self.collision_groups.keys():
-                # g_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*bone.pos + offset)
+                g_attr["density"] = str(base_density)
+
                 g_attr["contype"] = str(self.collision_groups[bone.name])
                 g_attr["conaffinity"] = str(self.conaffinity[bone.name])
 
@@ -291,16 +351,42 @@ class Skeleton:
                 if not self.color_dict is None:
                     g_attr["rgba"] = self.color_dict[bone.name]
 
-            # if bone.name in ["L_Ankle", "R_Ankle", "L_Toe", "R_Toe"]:
-            # g_attr["friction"] = "5 500 500"
-            # g_attr["solimp"] = "0.9 0.95 0.001 0.5 2"
-            # g_attr["solref"] = "0.02 1"
-            # g_attr["margin"] = "0.0000000000000000001"
+                if bone.name in ["L_Ankle", "R_Ankle", "L_Toe", "R_Toe"
+                                 ] and self.replace_feet:
+                    g_attr = {}
+                    hull_params = self.hull_dict[bone.name]
+                    min_verts, max_verts = hull_params['norm_verts'].min(
+                        axis=0), hull_params['norm_verts'].max(axis=0)
+                    size = max_verts - min_verts
 
-            # g_attr["solimp"] = "0.9 0.99 0.0001 0.5 2"
-            # g_attr["solref"] = "0.001 0.5"
-            # g_attr["condim"] = "6"
-            # g_attr["friction"] = "0 0 0"
+                    bone_end = bone.end
+                    pos = (max_verts + min_verts) / 2
+                    size /= 2
+
+                    if bone.name == "L_Toe" or bone.name == "R_Toe":
+                        parent_min, parent_max = self.hull_dict[
+                            bone.parent.name]['norm_verts'].min(
+                                axis=0), self.hull_dict[
+                                    bone.parent.name]['norm_verts'].max(axis=0)
+                        parent_pos = (parent_max + parent_min) / 2
+
+                        if self.upright_start:
+                            pos[2] = parent_min[2] - bone.pos[2] + size[2]  # To get toe to be at the same height as the parent
+                            pos[1] = parent_pos[1] - bone.pos[1]  # To get toe to be at the y as the parent
+                        else:
+                            pos[1] = parent_min[1] - bone.pos[1] + size[1]  # To get toe to be at the same height as the parent
+                            pos[0] = parent_pos[0] - bone.pos[0]  # To get toe to be at the y as the parent
+
+                    rot = np.array([1, 0, 0, 0])
+                    if self.real_weight_porpotion:
+                        g_attr["density"] = str(
+                            (hull_params['volume'] /
+                             (size[0] * size[1] * size[2] * 8)) * base_density)
+                    g_attr["type"] = "box"
+                    g_attr["pos"] = "{0:.4f} {1:.4f} {2:.4f}".format(*pos)
+                    g_attr["size"] = "{0:.4f} {1:.4f} {2:.4f}".format(*size)
+                    g_attr["quat"] = "{0:.4f} {1:.4f} {2:.4f} {3:.4f}".format(
+                        *rot)
 
             SubElement(node, "geom", g_attr)
         else:
@@ -333,3 +419,5 @@ class Skeleton:
         # write child bones
         for bone_c in bone.child:
             self.write_xml_bodynode(bone_c, node, offset, ref_angles)
+
+            

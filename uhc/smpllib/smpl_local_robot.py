@@ -1369,6 +1369,7 @@ class Robot:
                 simple_geom=False,
                 real_weight = self.real_weight,
                 replace_feet=self.replace_feet,
+                upright_start=self.upright_start,
             )
         else:
             self.skeleton = Skeleton()
@@ -2367,7 +2368,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     args = parser.parse_args()
     robot_cfg = {
-        "mesh": False,
+        "mesh": True,
         "rel_joint_lm": False,
         "upright_start": False,
         "remove_toe": False,
