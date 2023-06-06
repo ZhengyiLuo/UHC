@@ -67,7 +67,7 @@ if __name__ == "__main__":
     if args.no_fail_safe:
         cfg.fail_safe = False
 
-    cfg.output = osp.join("/hdd/zen/data/copycat/renderings/uhc/", f"{cfg.id}")
+    cfg.output = osp.join("results/renderings/uhc/", f"{cfg.id}")
     os.makedirs(cfg.output, exist_ok=True)
 
     cfg.data_specs["file_path"] = args.data

@@ -2210,7 +2210,7 @@ class Robot:
                 {
                     "name": "cone",
                     "file":
-                    "/hdd/zen/dev/copycat/Copycat/assets/mujoco_models/common/cone.stl",
+                    "assets/mujoco_models/common/cone.stl",
                     "scale": "0.025 0.025 0.04",
                 },
             )
