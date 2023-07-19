@@ -1,5 +1,11 @@
 # This script is borrowed and extended from https://github.com/nkolot/SPIN/blob/master/models/hmr.py
 # Adhere to their licence to use this script
+import glob
+import os
+import sys
+import pdb
+import os.path as osp
+sys.path.append(os.getcwd())
 
 import torch
 import numpy as np
@@ -411,7 +417,6 @@ class SMPL_Parser(_SMPL):
             joint_offsets = {joint_names[c]: (joint_pos[c] - joint_pos[p]) if c > 0 else joint_pos[c] for c, p in enumerate(smpl_joint_parents)}
             joint_parents = {x: joint_names[i] if i >= 0 else None for x, i in zip(joint_names, smpl_joint_parents)}
 
-            # skin_weights = smpl_layer.th_weights.numpy()
             skin_weights = self.lbs_weights.numpy()
             return (
                 verts,
@@ -530,10 +535,13 @@ class SMPLH_Parser(_SMPLH):
 
             return offset_smpl_dict, parents_dict, channels
 
-    def get_mesh_offsets(self, betas=torch.zeros(1, 16), flatfoot=False):
+    def get_mesh_offsets(self, zero_pose=None, betas=torch.zeros(1, 10), flatfoot=False):
         with torch.no_grad():
             joint_names = self.joint_names
-            verts, Jtr = self.get_joints_verts(self.zero_pose, th_betas=betas)
+            if zero_pose is None:
+                verts, Jtr = self.get_joints_verts(self.zero_pose, th_betas=betas)
+            else:
+                verts, Jtr = self.get_joints_verts(zero_pose, th_betas=betas)
 
             verts_np = verts.detach().cpu().numpy()
             verts = verts_np[0]
@@ -543,11 +551,11 @@ class SMPLH_Parser(_SMPLH):
                 verts[feet_subset, 1] = np.mean(verts[feet_subset][:, 1])
 
             smpl_joint_parents = self.parents.cpu().numpy()
+
             joint_pos = Jtr[0].numpy()
             joint_offsets = {joint_names[c]: (joint_pos[c] - joint_pos[p]) if c > 0 else joint_pos[c] for c, p in enumerate(smpl_joint_parents)}
             joint_parents = {x: joint_names[i] if i >= 0 else None for x, i in zip(joint_names, smpl_joint_parents)}
 
-            # skin_weights = smpl_layer.th_weights.numpy()
             skin_weights = self.lbs_weights.numpy()
             return (
                 verts,
@@ -646,19 +654,19 @@ class SMPLX_Parser(_SMPLX):
             verts, Jtr = self.get_joints_verts(self.zero_pose)
 
             smpl_joint_parents = self.parents.cpu().numpy()
+            joint_pick_idx = [SMPLX_BONE_ORDER_NAMES.index(i) for i in SMPLH_BONE_ORDER_NAMES]
             joint_pos = Jtr[0].numpy()
-            # print(
-            #     joint_pos.shape,
-            #     smpl_joint_parents.shape,
-            #     len(self.parents_to_use),
-            #     self.parents.cpu().numpy().shape,
-            # )
             joint_offsets = {joint_names[c]: (joint_pos[c] - joint_pos[p]) if c > 0 else joint_pos[c] for c, p in enumerate(smpl_joint_parents) if joint_names[c] in self.joint_names}
-            joint_parents = {x: joint_names[i] if i >= 0 else None for x, i in zip(joint_names, smpl_joint_parents) if joint_names[i] in self.joint_names}
+            joint_parents = {x: joint_names[i] if i >= 0 else None for x, i in zip(joint_names, smpl_joint_parents) if joint_names[i] in self.joint_names and x in self.joint_names}
+            joint_pos = joint_pos[joint_pick_idx]
 
             verts = verts[0].numpy()
-            # skin_weights = smpl_layer.th_weights.numpy()
+            #  (SMPLX_BONE_ORDER_NAMES[:22] + SMPLX_BONE_ORDER_NAMES[25:55]) == SMPLH_BONE_ORDER_NAMES # ZL Hack: only use the weights we need. 
             skin_weights = self.lbs_weights.numpy()[:, self.parents_to_use]
+            skin_weights.argmax(axis=1)
+            self.lbs_weights.numpy().argmax(axis = 1)
+            
+
             return (
                 verts,
                 joint_pos,

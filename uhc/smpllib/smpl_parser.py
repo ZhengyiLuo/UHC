@@ -667,23 +667,12 @@ class SMPLX_Parser(_SMPLX):
             
 
             smpl_joint_parents = self.parents.cpu().numpy()
+            joint_pick_idx = [SMPLX_BONE_ORDER_NAMES.index(i) for i in SMPLH_BONE_ORDER_NAMES]
             joint_pos = Jtr[0].numpy()
-            # print(
-            #     joint_pos.shape,
-            #     smpl_joint_parents.shape,
-            #     len(self.parents_to_use),
-            #     self.parents.cpu().numpy().shape,
-            # )
-            joint_offsets = {
-                joint_names[c]: (joint_pos[c] - joint_pos[p]) if c > 0 else joint_pos[c]
-                for c, p in enumerate(smpl_joint_parents)
-                if joint_names[c] in self.joint_names
-            }
-            joint_parents = {
-                x: joint_names[i] if i >= 0 else None
-                for x, i in zip(joint_names, smpl_joint_parents)
-                if joint_names[i] in self.joint_names
-            }
+            joint_offsets = {joint_names[c]: (joint_pos[c] - joint_pos[p]) if c > 0 else joint_pos[c] for c, p in enumerate(smpl_joint_parents) if joint_names[c] in self.joint_names}
+            joint_parents = {x: joint_names[i] if i >= 0 else None for x, i in zip(joint_names, smpl_joint_parents) if joint_names[i] in self.joint_names and x in self.joint_names}
+            joint_pos = joint_pos[joint_pick_idx]
+            
 
             verts = verts[0].numpy()
             # skin_weights = smpl_layer.th_weights.numpy()

@@ -1722,7 +1722,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     cfg = Config(cfg_id=args.cfg, create_dirs=False)
-    cfg.robot_cfg["model"] = "smpl"
+    cfg.robot_cfg["model"] = "smplx"
     cfg.robot_cfg["mesh"] = True
     # smpl_robot = Robot(cfg.robot_cfg, masterfoot=True)
     smpl_robot = Robot(cfg.robot_cfg, masterfoot=False)
@@ -1753,5 +1753,19 @@ if __name__ == "__main__":
 
     stop = False
     paused = False
-    while not stop:
+    sim.data.qpos[2] = 1
+    sim.forward()
+    while True:
+        # sim.data.qpos[2] = 1
+        # sim.data.qpos[7 + 42] = -np.pi/6
+        # sim.data.qpos[7 + 44] = -np.pi/2
+
+        # sim.data.qpos[7 + 59] = np.pi/2
+        # sim.data.qpos[7 + 57] = -np.pi/6
+        # sim.data.qpos[7 + 14] = -np.pi/3
+        # sim.data.qpos[7 + 28] = -np.pi/4
+        # sim.data.qpos[7 + 31] = -np.pi/4
+        sim.data.ctrl[:] = 0
+        # sim.forward()
+        sim.step()
         viewer.render()

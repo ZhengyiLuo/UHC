@@ -19,11 +19,8 @@ from io import BytesIO
 from mujoco_py import load_model_from_path, load_model_from_xml, MjSim, MjViewer
 from uhc.khrylib.mocap.skeleton_local import Skeleton
 from uhc.khrylib.mocap.skeleton_mesh_local import Skeleton as SkeletonMesh
-from uhc.smpllib.smpl_parser_local import (
-    SMPL_Parser,
-    SMPLH_Parser,
-    SMPLX_Parser,
-)
+from uhc.smpllib.smpl_parser_local import SMPL_Parser, SMPLH_Parser, SMPLX_Parser
+
 from collections import defaultdict
 from scipy.spatial import ConvexHull
 from stl import mesh
@@ -101,6 +98,7 @@ def get_joint_geometries(
         if len(vind) == 0:
             print(f"{jname} has no vertices!")
             continue
+        
         norm_verts = (smpl_verts[vind] - smpl_jts[jind]) * scale_dict.get(jname, 1)
 
         hull = ConvexHull(smpl_verts[vind])
@@ -1287,7 +1285,7 @@ class Robot:
             # self.model_dirs.append(f"amp/data/assets/mesh/smpl/{uuid.uuid4()}")
 
             self.skeleton = SkeletonMesh(self.model_dirs[-1])
-            zero_pose = torch.zeros((1, 72))
+            zero_pose = torch.zeros((1, 72)) if self.smpl_model == "smpl" else torch.zeros((1, 156))
             if self.upright_start:
                 zero_pose[0, :3] = torch.tensor(
                     [1.2091996, 1.2091996, 1.2091996])
@@ -1336,17 +1334,7 @@ class Robot:
                 scale_dict=size_dict,
                 geom_dir=f"{self.model_dirs[-1]}/geom",
             )
-            self.skeleton.load_from_offsets(
-                joint_offsets,
-                joint_parents,
-                joint_axes,
-                joint_dofs,
-                joint_range,
-                hull_dict = self.hull_dict,
-                sites={},
-                scale=1,
-                equalities={},
-                exclude_contacts=[["Chest", "L_Shoulder"],
+            excludes = [["Chest", "L_Shoulder"],
                                   ["Chest", "R_Shoulder"],
                                   ["Chest", "R_Thorax"], ["Chest", "L_Thorax"],
                                   ['L_Hip', 'Pelvis'], ['R_Hip', 'Pelvis'],
@@ -1360,10 +1348,23 @@ class Robot:
                                   ['R_Shoulder', 'R_Thorax'],
                                   ['L_Elbow', 'L_Shoulder'],
                                   ['R_Elbow', 'R_Shoulder'],
-                                  ['L_Wrist',
-                                   'L_Elbow'], ['R_Wrist', 'R_Elbow'],
-                                  ['L_Hand', 'L_Wrist'], ['R_Hand',
-                                                          'R_Wrist']],
+                                  ['L_Wrist','L_Elbow'], ['R_Wrist', 'R_Elbow'],
+                                  ['L_Hand', 'L_Wrist'], ['R_Hand','R_Wrist']
+                                  ]
+            if self.smpl_model == "smplx" or self.smpl_model == "smplh":
+                print("ZL Hack: need to add more hand-excludes for smplx and smplh")
+                excludes = excludes[:-2]
+            self.skeleton.load_from_offsets(
+                joint_offsets,
+                joint_parents,
+                joint_axes,
+                joint_dofs,
+                joint_range,
+                hull_dict = self.hull_dict,
+                sites={},
+                scale=1,
+                equalities={},
+                exclude_contacts=excludes,
                 collision_groups=contype,
                 conaffinity=conaffinity,
                 simple_geom=False,
@@ -2368,6 +2369,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     args = parser.parse_args()
     robot_cfg = {
+        'model': "smplx",
         "mesh": True,
         "rel_joint_lm": False,
         "upright_start": False,
@@ -2378,7 +2380,6 @@ if __name__ == "__main__":
         "masterfoot": False,
         "big_ankle": True,
         "master_range": 50,
-        "model": "smpl",
         "body_params": {},
         "joint_params": {},
         "geom_params": {},
