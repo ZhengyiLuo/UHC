@@ -1352,7 +1352,7 @@ class Robot:
                                   ['L_Hand', 'L_Wrist'], ['R_Hand','R_Wrist']
                                   ]
             if self.smpl_model == "smplx" or self.smpl_model == "smplh":
-                print("ZL Hack: need to add more hand-excludes for smplx and smplh")
+                # ZL Hack: need to add more hand-excludes for smplx and smplh
                 excludes = excludes[:-2]
             self.skeleton.load_from_offsets(
                 joint_offsets,
