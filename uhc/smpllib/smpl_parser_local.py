@@ -505,7 +505,7 @@ class SMPLH_Parser(_SMPLH):
 
     def get_offsets(self, zero_pose=None, betas=torch.zeros(1, 10), flatfoot=False):
        with torch.no_grad():
-           joint_names = self.joint_names
+            joint_names = self.joint_names
             if zero_pose is None:
                 verts, Jtr = self.get_joints_verts(self.zero_pose, th_betas=betas)
             else:
