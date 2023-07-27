@@ -1276,19 +1276,23 @@ class Robot:
             # print(f"Incorrect shape size for {self.model}!!!")
         elif self.smpl_model == "smplh" and self.beta.shape[1] == 10:
             self.beta = torch.hstack([self.beta, torch.zeros((1, 6)).float()])
+            
+        elif self.smpl_model == "smplx" and (self.beta.shape[1] == 10 or self.beta.shape[1] == 16):
+            self.beta = torch.hstack([self.beta, torch.zeros((1, 20 - self.beta.shape[1])).float()])
             # print(f"Incorrect shape size for {self.model}!!!")
 
         # self.remove_geoms()
+        zero_pose = torch.zeros((1, 72)) if self.smpl_model == "smpl" else torch.zeros((1, 156))
+        if self.upright_start:
+            zero_pose[0, :3] = torch.tensor([1.2091996, 1.2091996, 1.2091996])
+                
         size_dict = {}
         if self.mesh:
             self.model_dirs.append(f"/tmp/smpl/{uuid.uuid4()}")
             # self.model_dirs.append(f"amp/data/assets/mesh/smpl/{uuid.uuid4()}")
 
             self.skeleton = SkeletonMesh(self.model_dirs[-1])
-            zero_pose = torch.zeros((1, 72)) if self.smpl_model == "smpl" else torch.zeros((1, 156))
-            if self.upright_start:
-                zero_pose[0, :3] = torch.tensor(
-                    [1.2091996, 1.2091996, 1.2091996])
+            
             (
                 verts,
                 joints,
@@ -1301,10 +1305,7 @@ class Robot:
                 joint_range,
                 contype,
                 conaffinity,
-            ) = (smpl_parser.get_mesh_offsets(
-                zero_pose=zero_pose, betas=self.beta, flatfoot=self.flatfoot)
-                 if self.smpl_model != "smplx" else
-                 smpl_parser.get_mesh_offsets(v_template=v_template))
+            ) = smpl_parser.get_mesh_offsets(zero_pose=zero_pose, betas=self.beta, flatfoot=self.flatfoot)
 
             if self.rel_joint_lm:
                 if self.upright_start:
@@ -1374,13 +1375,9 @@ class Robot:
             )
         else:
             self.skeleton = Skeleton()
-            zero_pose = torch.zeros((1, 72))
-            if self.upright_start:
-                zero_pose[0, :3] = torch.tensor(
-                    [1.2091996, 1.2091996, 1.2091996])
+            
 
-            verts, joints, skin_weights, joint_names, joint_offsets, parents_dict, channels, joint_range = smpl_parser.get_offsets(
-                betas=self.beta, zero_pose=zero_pose)
+            verts, joints, skin_weights, joint_names, joint_offsets, parents_dict, channels, joint_range = smpl_parser.get_offsets(betas=self.beta, zero_pose=zero_pose)
             self.height = torch.max(verts[:, 1]) - torch.min(verts[:, 1])
             self.hull_dict = get_geom_dict(verts,
                                            joints,
@@ -2369,7 +2366,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     args = parser.parse_args()
     robot_cfg = {
-        'model': "smplx",
+        'model': "smplh",
         "mesh": True,
         "rel_joint_lm": False,
         "upright_start": False,
