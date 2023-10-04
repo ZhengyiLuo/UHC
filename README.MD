@@ -73,7 +73,23 @@ python uhc/smpllib/smpl_local_robot.py
 
 This model supports mesh and non-mesh based humanoid used in [Trace & Pace](https://research.nvidia.com/labs/toronto-ai/trace-pace/). There is a number of setting you can play with like "upright_start", which generates a humanoid that that starts in an upright position facing x-direcation (default SMPL faces upward). 
 
-You will need to have downloaded smpl model files from [SMPL](https://smpl.is.tue.mpg.de/), [SMPL-H](https://smpl.is.tue.mpg.de/downloads), and [SMPL-X](https://smpl-x.is.tue.mpg.de/downloads).
+You will need to have downloaded smpl model files from [SMPL](https://smpl.is.tue.mpg.de/), [SMPL-H](https://smpl.is.tue.mpg.de/downloads), and [SMPL-X](https://smpl-x.is.tue.mpg.de/downloads). Put them in the `data/smpl` folder, unzip them into 'data/smpl' folder. Please download the v1.1.0 version, which contains the neutral humanoid. Rename the files `basicmodel_neutral_lbs_10_207_0_v1.1.0`, `basicmodel_m_lbs_10_207_0_v1.1.0.pkl`, `basicmodel_f_lbs_10_207_0_v1.1.0.pkl` to `SMPL_NEUTRAL.pkl`, `SMPL_MALE.pkl` and `SMPL_FEMALE.pkl`. The file structure should look like this:
+
+```
+
+|-- data
+    |-- smpl
+        |-- SMPL_FEMALE.pkl
+        |-- SMPL_NEUTRAL.pkl
+        |-- SMPLH_MALE.pkl
+        |-- SMPLH_FEMALE.pkl
+        |-- SMPLH_NEUTRAL.pkl
+        |-- SMPLX_MALE.pkl
+        |-- SMPLX_FEMALE.pkl
+        |-- SMPLX_NEUTRAL.pkl
+        |-- SMPLX_MALE.pkl
+        
+```
 
 
 ## Data processing for training & evaluating UHC
