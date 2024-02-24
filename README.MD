@@ -5,7 +5,7 @@ TODOS:
 - [x] Tutorial for smpl_robot
 - [x] Runnable and trainalbe code for the SMPL model for motion imitation 
 - [x] Data processing code for the AMASS dataset
-- [ ] [Perpetual Humanoid Controller](https://github.com/ZhengyiLuo/PerpetualHumanoidControl) Support (No RFC model)
+- [x] [Perpetual Humanoid Controller](https://github.com/ZhengyiLuo/PerpetualHumanoidControl) Support (No RFC model). -> Please refer to [PHC-MJX](https://github.com/ZhengyiLuo/PHC_MJX).
 
 
 
