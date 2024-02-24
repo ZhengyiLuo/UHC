@@ -16,7 +16,7 @@ TODOS:
 
 ## News 🚩
 
-[Feb 24, 2023] [PHC-MJX](https://github.com/ZhengyiLuo/PHC_MJX) and [SMPLSim](https://github.com/ZhengyiLuo/SMPLSim) has been released. It is a porting of this codebase into the newest MuJoCo, and also incorporating lessons learned in PHC. 
+[Feb 24, 2024] [PHC-MJX](https://github.com/ZhengyiLuo/PHC_MJX) and [SMPLSim](https://github.com/ZhengyiLuo/SMPLSim) has been released. It is a porting of this codebase into the newest MuJoCo, and also incorporating lessons learned in PHC. 
 
 [Oct 15th, 2023 ] [PHC](https://github.com/ZhengyiLuo/PHC) (motion tracking in Isaac gym without residual force) has been released! Please go to PHC for the newest on motion tracking!
 
